@@ -1,0 +1,70 @@
+[project]
+name = "jiphyeonjeon-mcp"
+version = "0.1.0"
+description = "MCP server exposing 집현전 (PaperReviewAgent) as Claude agent/skill tools"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Jiseong", email = "js_2109@naver.com" }
+]
+requires-python = ">=3.12"
+keywords = ["mcp", "claude", "paper-review", "jiphyeonjeon", "academic"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+    "mcp[cli]>=1.2.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+]
+
+[project.scripts]
+jiphyeonjeon-mcp = "jiphyeonjeon_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/jiseong/jiphyeonjeon-mcp"
+Issues = "https://github.com/jiseong/jiphyeonjeon-mcp/issues"
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "respx>=0.21.0",
+    "ruff>=0.6.0",
+    "mypy>=1.11.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S", "N802"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers"
+markers = [
+    "integration: requires live 집현전 backend at JIPHYEONJEON_BASE_URL",
+]
