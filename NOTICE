@@ -1,0 +1,21 @@
+jiphyeonjeon-agent
+Copyright 2026 Jiseong (KimJiSeong1994)
+
+This product wraps the 집현전 / PaperReviewAgent HTTP API as a set of
+Claude agent tools over the Model Context Protocol (MCP).
+
+Upstream: https://github.com/KimJiSeong1994/PaperReview
+Source:   https://github.com/KimJiSeong1994/jiphyeonjeon-agent
+
+This product includes software developed by third parties distributed
+under compatible open-source licenses. Notable runtime dependencies:
+
+  - mcp (Model Context Protocol Python SDK) — MIT License
+    https://github.com/modelcontextprotocol/python-sdk
+  - httpx — BSD 3-Clause License
+    https://github.com/encode/httpx
+  - pydantic / pydantic-settings — MIT License
+    https://github.com/pydantic/pydantic
+
+See the LICENSE file for the terms under which this software is
+distributed (Apache License 2.0).

@@ -26,8 +26,16 @@ def _build() -> FastMCP:
     caps = ServerCapabilities(
         version="1.1.0",
         capabilities=frozenset(
-            {"search", "papers", "deep_review", "bookmarks", "curriculum",
-             "explore", "autofigure", "blog"}
+            {
+                "search",
+                "papers",
+                "deep_review",
+                "bookmarks",
+                "curriculum",
+                "explore",
+                "autofigure",
+                "blog",
+            }
         ),
     )
     mcp = FastMCP(name="contract-test")
@@ -53,9 +61,7 @@ def _captured(route: respx.Route) -> dict[str, Any]:
 @respx.mock
 async def test_search_papers_sends_backend_field_names() -> None:
     route = respx.post("http://backend.test/api/search").mock(
-        return_value=httpx.Response(
-            200, json={"results": {"arxiv": [{"id": "p1"}]}, "total": 1}
-        )
+        return_value=httpx.Response(200, json={"results": {"arxiv": [{"id": "p1"}]}, "total": 1})
     )
     mcp = _build()
     await mcp.call_tool(

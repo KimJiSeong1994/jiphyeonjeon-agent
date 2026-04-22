@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
+from collections.abc import Awaitable, Callable
 
 from mcp.server.fastmcp import FastMCP
 
@@ -34,7 +35,9 @@ def _configure_logging() -> None:
     )
 
 
-def _build_client_factory(settings: Settings):
+def _build_client_factory(
+    settings: Settings,
+) -> Callable[[], Awaitable[JiphyeonjeonClient]]:
     """Return an async factory that yields a fresh ``JiphyeonjeonClient`` context.
 
     Each tool call creates its own client. This is simpler than a shared client

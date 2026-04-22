@@ -84,7 +84,11 @@ class JiphyeonjeonClient:
         for long-running endpoints (curriculum generate, deep review start).
         """
         response = await self._request(
-            "POST", path, json=body, operation=operation, timeout=timeout,
+            "POST",
+            path,
+            json=body,
+            operation=operation,
+            timeout=timeout,
         )
         if not response.content:
             return None

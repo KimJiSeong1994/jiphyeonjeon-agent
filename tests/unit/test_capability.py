@@ -40,9 +40,7 @@ async def test_version_endpoint_present() -> None:
 
 @respx.mock
 async def test_404_falls_back_to_baseline() -> None:
-    respx.get("http://backend.test/api/version").mock(
-        return_value=httpx.Response(404)
-    )
+    respx.get("http://backend.test/api/version").mock(return_value=httpx.Response(404))
     caps = await discover_capabilities(_settings())
     assert caps.version == "legacy"
     assert caps.capabilities == BASELINE_CAPABILITIES

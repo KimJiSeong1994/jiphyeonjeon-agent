@@ -5,7 +5,7 @@ description = "MCP server exposing 집현전 (PaperReviewAgent) as Claude agent/
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-    { name = "Jiseong", email = "js_2109@naver.com" }
+    { name = "Jiseong (KimJiSeong1994)" }
 ]
 requires-python = ">=3.12"
 keywords = ["mcp", "claude", "paper-review", "jiphyeonjeon", "academic"]
@@ -28,8 +28,10 @@ dependencies = [
 jiphyeonjeon-mcp = "jiphyeonjeon_mcp.server:main"
 
 [project.urls]
-Homepage = "https://github.com/jiseong/jiphyeonjeon-mcp"
-Issues = "https://github.com/jiseong/jiphyeonjeon-mcp/issues"
+Homepage = "https://github.com/KimJiSeong1994/jiphyeonjeon-agent"
+Issues = "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/issues"
+Source = "https://github.com/KimJiSeong1994/jiphyeonjeon-agent"
+"Upstream API" = "https://github.com/KimJiSeong1994/PaperReview"
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]

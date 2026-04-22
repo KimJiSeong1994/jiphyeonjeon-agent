@@ -11,10 +11,15 @@ from pydantic import SecretStr
 from jiphyeonjeon_mcp.client import JiphyeonjeonClient
 from jiphyeonjeon_mcp.config import Settings
 
+# Obviously-fake token; makes it clear to scanners and readers that this is
+# not a real credential. Use the same constant anywhere a placeholder JWT is
+# needed in tests.
+_FAKE_JWT = "FAKE-TEST-TOKEN-NOT-A-REAL-JWT"  # noqa: S105 — test fixture
+
 
 def _settings() -> Settings:
     return Settings(
-        token=SecretStr("test-jwt-token"),
+        token=SecretStr(_FAKE_JWT),
         base_url="http://backend.test",
         timeout=5.0,
         verify_ssl=True,
@@ -32,7 +37,7 @@ async def test_get_json_success() -> None:
     assert route.called
     # Auth header forwarded
     sent = route.calls.last.request.headers.get("authorization")
-    assert sent == "Bearer test-jwt-token"
+    assert sent == f"Bearer {_FAKE_JWT}"
 
 
 @respx.mock
@@ -41,6 +46,7 @@ async def test_post_json_forwards_body() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         import json as _json
+
         captured["body"] = _json.loads(request.content.decode())
         return httpx.Response(200, json={"session_id": "s1"})
 
@@ -68,16 +74,14 @@ async def test_401_translates_to_mcp_error() -> None:
 
 @respx.mock
 async def test_connection_error_wrapped() -> None:
-    respx.get("http://backend.test/api/version").mock(
-        side_effect=httpx.ConnectError("refused")
-    )
+    respx.get("http://backend.test/api/version").mock(side_effect=httpx.ConnectError("refused"))
     async with JiphyeonjeonClient(_settings()) as client:
         with pytest.raises(McpError) as exc_info:
             await client.get_json("/api/version", operation="probe")
     msg = str(exc_info.value)
     assert "네트워크 오류" in msg
     # Never leak token in error message
-    assert "test-jwt-token" not in msg
+    assert _FAKE_JWT not in msg
 
 
 async def test_client_outside_context_raises() -> None:
@@ -88,9 +92,7 @@ async def test_client_outside_context_raises() -> None:
 
 @respx.mock
 async def test_delete_returns_none_for_empty_body() -> None:
-    respx.delete("http://backend.test/api/bookmarks/123").mock(
-        return_value=httpx.Response(204)
-    )
+    respx.delete("http://backend.test/api/bookmarks/123").mock(return_value=httpx.Response(204))
     async with JiphyeonjeonClient(_settings()) as client:
         data = await client.delete("/api/bookmarks/123", operation="remove bm")
     assert data is None

@@ -1,7 +1,7 @@
 .PHONY: help sync test lint typecheck dev inspector install-skills clean
 
 help:
-	@echo "jiphyeonjeon-mcp dev targets:"
+	@echo "jiphyeonjeon-agent dev targets:"
 	@echo "  make sync           - uv sync (install deps)"
 	@echo "  make test           - pytest unit tests"
 	@echo "  make lint           - ruff check + format check"

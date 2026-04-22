@@ -30,8 +30,16 @@ def _build_mcp_with_all_tools() -> tuple[FastMCP, list[str]]:
     caps = ServerCapabilities(
         version="1.1.0",
         capabilities=frozenset(
-            {"search", "papers", "deep_review", "bookmarks", "curriculum",
-             "explore", "autofigure", "blog"}
+            {
+                "search",
+                "papers",
+                "deep_review",
+                "bookmarks",
+                "curriculum",
+                "explore",
+                "autofigure",
+                "blog",
+            }
         ),
     )
     mcp = FastMCP(name="test")
@@ -48,11 +56,17 @@ def test_all_eleven_tools_registered() -> None:
     _mcp, registered = _build_mcp_with_all_tools()
     assert len(registered) == 11
     expected = {
-        "search_papers", "get_paper",
-        "start_review", "get_review_status",
-        "list_bookmarks", "add_bookmark", "remove_bookmark",
-        "create_curriculum", "explore_related",
-        "generate_figure", "create_blog_draft",
+        "search_papers",
+        "get_paper",
+        "start_review",
+        "get_review_status",
+        "list_bookmarks",
+        "add_bookmark",
+        "remove_bookmark",
+        "create_curriculum",
+        "explore_related",
+        "generate_figure",
+        "create_blog_draft",
     }
     assert set(registered) == expected
 
@@ -82,7 +96,7 @@ async def test_tool_schema_contains_expected_fields() -> None:
     props = sp.inputSchema.get("properties", {})
     assert "query" in props
     assert "max_results" in props  # backend field name (was 'limit')
-    assert "year_start" in props   # backend field name (was 'year_from')
+    assert "year_start" in props  # backend field name (was 'year_from')
 
     sr = by_name["start_review"]
     props_sr = sr.inputSchema.get("properties", {})
@@ -98,9 +112,7 @@ async def test_tool_schema_contains_expected_fields() -> None:
 async def test_search_papers_end_to_end() -> None:
     """Invoke the tool through the real call chain (httpx mocked)."""
     respx.post("http://backend.test/api/search").mock(
-        return_value=httpx.Response(
-            200, json={"papers": [{"id": "p1", "title": "Survey"}]}
-        )
+        return_value=httpx.Response(200, json={"papers": [{"id": "p1", "title": "Survey"}]})
     )
     mcp, _ = _build_mcp_with_all_tools()
     result = await mcp.call_tool("search_papers", {"query": "LLM agents", "limit": 5})

@@ -1,6 +1,6 @@
-# jiphyeonjeon-mcp
+# jiphyeonjeon-agent
 
-MCP server wrapping 집현전 (PaperReviewAgent) REST API. Wraps FastAPI backend at `/Users/jiseong/git/PaperReviewAgent` as Claude tools via stdio transport.
+Claude agent bridge to 집현전 (PaperReviewAgent) — wraps its FastAPI REST API as Claude tools over stdio MCP transport.
 
 ## Architecture
 
@@ -18,9 +18,8 @@ src/jiphyeonjeon_mcp/
   auth.py           # 401/404/429 -> McpError translation
   config.py         # pydantic-settings env loader (SecretStr for token)
   capability.py     # GET /api/version -> dynamic tool registration
+  validators.py     # ID path-traversal defense
   tools/            # One module per domain (search, review, bookmarks, ...)
-  resources/        # jh:// URI handlers
-  generated/        # auto-gen from openapi.json (committed for reproducibility)
 ```
 
 ## Critical constraints
@@ -32,16 +31,15 @@ src/jiphyeonjeon_mcp/
 
 ## Local dev loop
 
-1. Start 집현전 backend: `cd /Users/jiseong/git/PaperReviewAgent && python api_server.py` (port 8000)
+1. Start 집현전 backend: `cd path/to/PaperReviewAgent && python api_server.py` (port 8000)
 2. Develop MCP: `uv run mcp dev src/jiphyeonjeon_mcp/server.py` (MCP Inspector at :6274)
 3. Test in Claude Code: `claude mcp add jiphyeonjeon-dev -- uv --directory $(pwd) run jiphyeonjeon-mcp`
 
 ## Cross-repo coordination
 
-- 집현전 repo: `/Users/jiseong/git/PaperReviewAgent` (FastAPI + SQLite + FAISS)
-- 집현전 OpenAPI at runtime: `http://localhost:8000/openapi.json`
-- 집현전 CLAUDE.md: `/Users/jiseong/git/PaperReviewAgent/.claude/CLAUDE.md`
-- Capability endpoint: `GET /api/version` — tells MCP which tools to register
+- 집현전 repo: [KimJiSeong1994/PaperReview](https://github.com/KimJiSeong1994/PaperReview) (FastAPI + SQLite + FAISS)
+- 집현전 OpenAPI at runtime: `<JIPHYEONJEON_BASE_URL>/openapi.json`
+- Capability endpoint: `GET /api/version` — tells the agent which tools to register
 
 ## Coding conventions
 

@@ -11,8 +11,6 @@
 
 ---
 
-<!-- TODO: Claude Code 대화 스크린샷 -->
-
 한 번의 Claude 대화로 집현전의 모든 기능 접근. 자신의 계정 권한 그대로, 검색·리뷰·북마크·커리큘럼을 자동 실행합니다.
 
 ---
@@ -51,11 +49,15 @@ Claude Code에서 다음 중 하나를 말하면 자동 설치됩니다:
 ### Option 2: 터미널 원샷
 
 ```bash
-cd path/to/jiphyeonjeon-agent
+# 1) clone — 경로는 자유 (아래는 예시)
+git clone https://github.com/KimJiSeong1994/jiphyeonjeon-agent.git ~/jiphyeonjeon-agent
+cd ~/jiphyeonjeon-agent
+
+# 2) 한 번에 설치 (uv sync + JWT 발급 프롬프트 + claude mcp add + 스킬 복사)
 bash scripts/setup.sh
 ```
 
-집현전 credentials 프롬프트 → Claude MCP 등록 → 완료.
+집현전 username/password 프롬프트 → Claude MCP 등록 → 완료.
 
 ### Option 3: 수동 (고급)
 

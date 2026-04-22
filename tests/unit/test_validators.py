@@ -29,7 +29,7 @@ def test_accepts_colons_dots_underscores() -> None:
         "id with space",
         "id\nline",
         "id'quote",
-        "id\"quote",
+        'id"quote',
         "id;drop",
         "id?q=1",
         "",
