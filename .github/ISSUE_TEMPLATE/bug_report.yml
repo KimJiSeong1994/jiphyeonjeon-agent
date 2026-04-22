@@ -1,0 +1,83 @@
+name: Bug report
+description: Something doesn't work as expected
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        감사합니다! 버그 재현을 위해 아래 정보를 가능한 한 자세히 적어 주세요.
+        This is a solo-maintained alpha — responses are best-effort.
+
+  - type: input
+    id: env-agent
+    attributes:
+      label: jiphyeonjeon-agent version
+      description: "`uv run python -c 'from jiphyeonjeon_mcp import __version__; print(__version__)'`"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: env-backend
+    attributes:
+      label: 집현전 backend version (and URL)
+      description: "`curl <JIPHYEONJEON_BASE_URL>/api/version` 결과"
+      placeholder: "1.1.0 · https://jiphyeonjeon.kr"
+    validations:
+      required: true
+
+  - type: input
+    id: env-python
+    attributes:
+      label: Python & OS
+      description: "`python --version`, `uname -a`"
+      placeholder: "Python 3.12.7 · Darwin arm64"
+    validations:
+      required: true
+
+  - type: input
+    id: env-claude
+    attributes:
+      label: Claude host
+      description: Claude Code / Claude Desktop / other MCP client
+      placeholder: "Claude Code 0.x"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: 가능하면 최소 재현 경로를 번호 매겨서
+      placeholder: |
+        1. `bash scripts/setup.sh` 완료
+        2. Claude 에 `...` 입력
+        3. 에러: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs Actual
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / stderr
+      description: |
+        MCP host 의 stderr 로그에서 `jiphyeonjeon_mcp` 로 시작하는 줄.
+        **토큰 · 비밀번호는 직접 마스킹하세요.** stdout 은 JSON-RPC 라 사람이 읽기 어려움.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Sanity checks
+      options:
+        - label: "`curl <base>/health` 가 200을 반환한다"
+        - label: 토큰이 만료되지 않았다 (24h 이내 발급)
+        - label: 관련 공개 이슈 중 중복 없음을 확인했다

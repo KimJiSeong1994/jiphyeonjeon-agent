@@ -3,10 +3,11 @@
 
   <p><strong>Bring 집현전 to Claude — 논문 검색 · 딥리뷰 · 북마크 · 커리큘럼까지 Claude 대화창에서</strong></p>
 
+  [![CI](https://img.shields.io/github/actions/workflow/status/KimJiSeong1994/jiphyeonjeon-agent/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/KimJiSeong1994/jiphyeonjeon-agent/actions/workflows/ci.yml)
   [![License](https://img.shields.io/badge/License-Apache_2.0-green?style=for-the-badge)](./LICENSE)
   [![Python](https://img.shields.io/badge/Python-3.12-3776ab?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
   [![Claude Code Compatible](https://img.shields.io/badge/Claude_Code-Compatible-blue?style=for-the-badge)](https://claude.ai)
-  [![Status](https://img.shields.io/badge/Status-Alpha-yellow?style=for-the-badge)](./CHANGELOG.md)
+  [![Release](https://img.shields.io/github/v/release/KimJiSeong1994/jiphyeonjeon-agent?include_prereleases&style=for-the-badge)](https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases)
 </div>
 
 ---

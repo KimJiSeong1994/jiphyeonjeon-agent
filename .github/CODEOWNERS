@@ -1,0 +1,3 @@
+# Default owner for every file — auto-request review on all PRs.
+# (Overrides further down add more granular rules if needed later.)
+*    @KimJiSeong1994

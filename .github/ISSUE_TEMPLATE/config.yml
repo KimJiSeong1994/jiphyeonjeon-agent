@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 집현전 API / 백엔드 이슈
+    url: https://github.com/KimJiSeong1994/PaperReview/issues
+    about: "API 동작, 엔드포인트 누락, 검색 품질 등 백엔드 이슈는 집현전 repo 에 제보해 주세요."
+  - name: 보안 취약점 신고
+    url: https://github.com/KimJiSeong1994/jiphyeonjeon-agent/security/advisories/new
+    about: "공개 이슈 대신 private security advisory 로 신고해 주세요."
