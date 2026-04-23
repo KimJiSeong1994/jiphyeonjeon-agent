@@ -78,7 +78,7 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
       "args": ["--directory", "path/to/jiphyeonjeon-agent", "run", "jiphyeonjeon-mcp"],
       "env": {
         "JIPHYEONJEON_TOKEN": "<your-jwt>",
-        "JIPHYEONJEON_BASE_URL": "http://localhost:8000"
+        "JIPHYEONJEON_BASE_URL": "https://jiphyeonjeon.kr"
       }
     }
   }
@@ -147,7 +147,8 @@ Claude Code (stdio)
         │
         ↓ (httpx + Bearer JWT)
   집현전 FastAPI
-  (localhost:8000)
+  (https://jiphyeonjeon.kr — default;
+   localhost:8000 for self-hosting)
 ```
 
 부트스트랩 순서:
@@ -179,7 +180,7 @@ Claude Code (stdio)
 | 변수 | 필수 | 설명 |
 |------|------|------|
 | `JIPHYEONJEON_TOKEN` | Yes | JWT Bearer token (from `POST /api/auth/login`) |
-| `JIPHYEONJEON_BASE_URL` | No | 집현전 FastAPI 주소 (기본: `http://localhost:8000`) |
+| `JIPHYEONJEON_BASE_URL` | No | 집현전 FastAPI 주소 (기본: `https://jiphyeonjeon.kr`, 자체 호스팅 개발자만 `http://localhost:8000`) |
 | `JIPHYEONJEON_TIMEOUT` | No | 요청 타임아웃 초 (기본: `30.0`, 검색은 90 권장) |
 | `JIPHYEONJEON_VERIFY_SSL` | No | TLS 인증서 검증 (기본: `true`, 로컬 자체 서명만 false) |
 | `JIPHYEONJEON_SCOPE` | No | Claude Code MCP 등록 스코프 (기본: `user`) |

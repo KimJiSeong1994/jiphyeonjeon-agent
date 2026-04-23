@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     """Runtime configuration loaded from env vars.
 
     - ``JIPHYEONJEON_TOKEN`` *(required)* — Bearer JWT from ``POST /api/auth/login``.
-    - ``JIPHYEONJEON_BASE_URL`` *(default: http://localhost:8000)* — 집현전 FastAPI root.
+    - ``JIPHYEONJEON_BASE_URL`` *(default: https://jiphyeonjeon.kr)* — 집현전 FastAPI root.
+      End users hit the hosted instance by default; local developers override to
+      ``http://localhost:8000`` when running their own PaperReviewAgent.
     - ``JIPHYEONJEON_TIMEOUT`` *(default: 30.0)* — per-request timeout in seconds.
     - ``JIPHYEONJEON_VERIFY_SSL`` *(default: True)* — disable only for dev w/ self-signed certs.
     """
@@ -33,7 +35,7 @@ class Settings(BaseSettings):
         description="JWT Bearer token obtained from POST /api/auth/login",
     )
     base_url: str = Field(
-        default="http://localhost:8000",
+        default="https://jiphyeonjeon.kr",
         description="집현전 FastAPI base URL (no trailing slash)",
     )
     timeout: float = Field(

@@ -24,7 +24,10 @@ done
 export PATH
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BASE_URL="${JIPHYEONJEON_BASE_URL:-http://localhost:8000}"
+# Default to the hosted production endpoint so `/jh:setup` "just works"
+# for end users.  Local developers running their own backend can override:
+#   JIPHYEONJEON_BASE_URL=http://localhost:8000 bash scripts/setup.sh
+BASE_URL="${JIPHYEONJEON_BASE_URL:-https://jiphyeonjeon.kr}"
 SCOPE="${JIPHYEONJEON_SCOPE:-user}"
 TIMEOUT="${JIPHYEONJEON_TIMEOUT:-90}"
 
@@ -51,8 +54,9 @@ require_cmd python3
 
 if ! curl -fsS "${BASE_URL}/health" >/dev/null 2>&1; then
   warn "집현전 backend not reachable at ${BASE_URL}"
-  warn "  start it with:  cd /path/to/PaperReviewAgent && python api_server.py"
-  warn "  or override with JIPHYEONJEON_BASE_URL=https://... ./scripts/setup.sh"
+  warn "  default is the hosted instance (https://jiphyeonjeon.kr) — check your network"
+  warn "  local developers can run their own backend and point here:"
+  warn "    JIPHYEONJEON_BASE_URL=http://localhost:8000 bash scripts/setup.sh"
   read -rp "continue anyway? [y/N] " cont
   case "$cont" in
     y|Y|yes) ;;
