@@ -3,7 +3,8 @@ name = "jiphyeonjeon-mcp"
 version = "0.1.2"
 description = "MCP server exposing 집현전 (PaperReviewAgent) as Claude agent/skill tools"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 authors = [
     { name = "Jiseong (KimJiSeong1994)" }
 ]
@@ -12,7 +13,6 @@ keywords = ["mcp", "claude", "paper-review", "jiphyeonjeon", "academic"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
 ]
