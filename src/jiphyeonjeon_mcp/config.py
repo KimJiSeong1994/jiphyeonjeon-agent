@@ -48,6 +48,14 @@ class Settings(BaseSettings):
         default=True,
         description="Verify TLS certificates (set False only for local dev)",
     )
+    auto_update_check: bool = Field(
+        default=True,
+        description=(
+            "Check GitHub Releases at server startup for a newer jiphyeonjeon-mcp "
+            "version (set JIPHYEONJEON_AUTO_UPDATE_CHECK=0 to disable). The check "
+            "is advisory only — it logs to stderr and never blocks startup."
+        ),
+    )
 
     @property
     def normalized_base_url(self) -> str:

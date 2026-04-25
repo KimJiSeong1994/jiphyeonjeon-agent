@@ -24,6 +24,7 @@ from jiphyeonjeon_mcp.capability import ServerCapabilities, discover_capabilitie
 from jiphyeonjeon_mcp.client import JiphyeonjeonClient
 from jiphyeonjeon_mcp.config import Settings, load_settings
 from jiphyeonjeon_mcp.tools import register_all
+from jiphyeonjeon_mcp.updater import UpdateCheckResult, check_for_updates
 
 
 def _configure_logging() -> None:
@@ -32,6 +33,29 @@ def _configure_logging() -> None:
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         stream=sys.stderr,
+    )
+
+
+def _emit_update_notice(result: UpdateCheckResult) -> None:
+    """Print a single-line update notice to stderr when a new release exists.
+
+    Format is fixed so log scrapers can parse it. No ANSI colors — Claude Code
+    strips them anyway. Errors from the check are demoted to DEBUG so they do
+    not noise up MCP status panels.
+    """
+    if result.error is not None:
+        logging.getLogger("jiphyeonjeon_mcp.updater").debug(
+            "update check skipped: %s", result.error
+        )
+        return
+    if not result.update_available or not result.latest_version:
+        return
+    print(
+        f"[jiphyeonjeon-mcp] new release {result.latest_version} available "
+        f"(current {result.current_version}). Run /jh:update to upgrade. "
+        f"Release notes: {result.release_url or 'n/a'}",
+        file=sys.stderr,
+        flush=True,
     )
 
 
@@ -82,12 +106,21 @@ def main() -> None:
         settings.timeout,
     )
 
-    capabilities = asyncio.run(discover_capabilities(settings))
+    async def _boot_probes() -> tuple[ServerCapabilities, UpdateCheckResult]:
+        # Run capability negotiation and the GitHub update check concurrently
+        # so the update check adds no latency to the critical startup path.
+        return await asyncio.gather(
+            discover_capabilities(settings),
+            check_for_updates(settings),
+        )
+
+    capabilities, update_result = asyncio.run(_boot_probes())
     logger.info(
         "Negotiated capabilities (server=%s): %s",
         capabilities.version,
         sorted(capabilities.capabilities),
     )
+    _emit_update_notice(update_result)
 
     mcp, registered = _build_server(settings, capabilities)
     logger.info("Registered %d tools: %s", len(registered), registered)

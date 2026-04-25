@@ -1,6 +1,6 @@
 [project]
 name = "jiphyeonjeon-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "MCP server exposing 집현전 (PaperReviewAgent) as Claude agent/skill tools"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -22,6 +22,7 @@ dependencies = [
     "httpx>=0.27.0",
     "pydantic>=2.7.0",
     "pydantic-settings>=2.3.0",
+    "packaging>=23.0",
 ]
 
 [project.scripts]

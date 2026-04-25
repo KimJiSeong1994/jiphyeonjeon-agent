@@ -183,6 +183,7 @@ Claude Code (stdio)
 | `JIPHYEONJEON_BASE_URL` | No | 집현전 FastAPI 주소 (기본: `https://jiphyeonjeon.kr`, 자체 호스팅 개발자만 `http://localhost:8000`) |
 | `JIPHYEONJEON_TIMEOUT` | No | 요청 타임아웃 초 (기본: `30.0`, 검색은 90 권장) |
 | `JIPHYEONJEON_VERIFY_SSL` | No | TLS 인증서 검증 (기본: `true`, 로컬 자체 서명만 false) |
+| `JIPHYEONJEON_AUTO_UPDATE_CHECK` | No | 시작 시 GitHub Releases 에서 새 버전 확인 (기본: `true`, `0` 으로 비활성화). 알림만 — 자동 업데이트 아님 |
 | `JIPHYEONJEON_SCOPE` | No | Claude Code MCP 등록 스코프 (기본: `user`) |
 
 ---
