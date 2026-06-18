@@ -3,41 +3,62 @@
 > SEO·GEO 전략(`docs/strategy/seo-geo-strategy.md`) 기둥 C "MCP 유통 플라이휠"의 실행 문서.
 > 각 등재 = 백링크 + LLM이 읽는 코퍼스 항목 + 발견 채널. UI/UX 무변경, 이 repo에서 즉시 실행 가능.
 
-## 0. 전제조건 (블로커)
+> ### ⛔ 결정(2026-06-18): **PyPI 게시 제외**
+> PyPI에 올리지 않는다. 영향:
+> - **공식 MCP Registry의 `pypi` 경로는 사용 불가** (레지스트리가 실제 PyPI 패키지로 소유권 검증). → 대안: **`mcpb`**(GitHub 릴리스 아티팩트로 등재, PyPI 불필요) 또는 **`oci`**(ghcr.io 이미지). **권장: `mcpb`** (§1B).
+> - **GitHub-repo 기반 채널(Glama·awesome·mcp.so·PulseMCP)은 영향 없음** — PyPI 불필요. 지금 즉시 진행 가능한 주 경로(§2).
+> - **설치**도 PyPI 불필요: `uvx --from git+https://github.com/KimJiSeong1994/jiphyeonjeon-agent jiphyeonjeon-mcp` 또는 README의 clone 방식.
 
-1. **PyPI 게시.** MCP Registry는 *메타데이터만* 호스팅하고 실제 패키지는 PyPI에서 검증한다. 따라서 `jiphyeonjeon-mcp`를 PyPI에 먼저 게시해야 한다.
-   ```bash
-   uv build
-   uv publish        # 또는 twine upload dist/*  (PyPI 토큰 필요)
-   ```
-2. **소유권 검증 마커.** Registry는 PyPI 패키지 설명(=README)에서 `mcp-name: io.github.KimJiSeong1994/jiphyeonjeon-agent` 문자열을 찾아 소유권을 검증한다. → 이미 `README.md` 상단에 HTML 주석으로 추가됨:
+## 0. 전제조건
+
+1. **공개 GitHub repo.** Glama 자동색인·awesome PR·Show HN 검수의 전제. (이미 공개)
+2. **GitHub 네임스페이스.** 공식 레지스트리 사용 시 서버 이름은 `io.github.<username>/...` 형식. (username = `KimJiSeong1994`, `server.json`의 `name`과 일치)
+3. **소유권 검증 마커(레지스트리용).** `README.md` 상단에 추가됨 — `mcpb`에선 불필요하나 무해하므로 유지:
    ```html
    <!-- mcp-name: io.github.KimJiSeong1994/jiphyeonjeon-agent -->
    ```
-   이 값은 `server.json`의 `name`과 **정확히 일치**해야 한다.
-3. **GitHub 네임스페이스.** GitHub 인증을 쓰므로 서버 이름은 반드시 `io.github.<username>/...` 형식. (username = `KimJiSeong1994`)
 
 ## 1. 공식 MCP Registry 발행
 
-루트의 [`server.json`](../../server.json)이 준비되어 있다(스키마 `2025-12-11`, `registryType: pypi`, `transport: stdio`).
+### 1A. 현재 `server.json` (pypi 변형) — **PyPI 제외 결정으로 보류**
+루트의 [`server.json`](../../server.json)은 `registryType: pypi` 변형이다. PyPI에 게시하지 않기로 했으므로 **이 상태로는 발행 불가**(레지스트리가 PyPI에서 패키지를 못 찾음). PyPI를 다시 허용할 때 사용할 참조 템플릿으로 유지.
+
+### 1B. 권장: `mcpb` 변형으로 발행 (PyPI 불필요)
+GitHub 릴리스에 `.mcpb` 번들을 올려 그 URL로 등재한다. 검증은 (a) URL에 `mcp` 포함(`.mcpb` 확장자로 충족) + (b) `server.json`의 `fileSha256`로 이뤄진다 — README 마커·PyPI 불필요.
 
 ```bash
-# mcp-publisher 설치 (Homebrew)
+# 1) .mcpb 번들 생성 (MCPB CLI). Python stdio 서버용 manifest 필요.
+npx @anthropic-ai/mcpb init      # manifest.json 생성/편집
+npx @anthropic-ai/mcpb pack      # -> jiphyeonjeon-agent.mcpb
+
+# 2) GitHub 릴리스에 첨부
+gh release create v0.1.3 --generate-notes
+gh release upload v0.1.3 jiphyeonjeon-agent.mcpb
+
+# 3) sha256 계산 → server.json(mcpb 변형)의 fileSha256 에 기입
+openssl dgst -sha256 jiphyeonjeon-agent.mcpb
+
+# 4) 발행
 brew install mcp-publisher
-
-# 스키마/메타데이터 검증 — 발행 전 필수
-mcp-publisher validate          # server.json 유효성 확인
-
-# 인증 후 발행
+mcp-publisher validate
 mcp-publisher login github
 mcp-publisher publish
-
-# 확인
 curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 ```
 
-> ⚠️ Registry는 preview 단계라 스키마가 바뀔 수 있다. `mcp-publisher init`로 최신 템플릿을 재생성해 `server.json`을 대조하라.
-> 발행 자동화는 GitHub Actions로 가능: https://modelcontextprotocol.io/registry/github-actions
+`mcpb` 변형 `server.json`의 `packages[]` 예시:
+```json
+{
+  "registryType": "mcpb",
+  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.3/jiphyeonjeon-agent.mcpb",
+  "fileSha256": "<openssl 결과>",
+  "transport": { "type": "stdio" }
+}
+```
+
+> ⚠️ Registry는 preview라 스키마가 바뀔 수 있음 — `mcp-publisher init`로 최신 템플릿 대조.
+> 대안: `oci`(ghcr.io 이미지 + `io.modelcontextprotocol.server.name` LABEL). stdio Python 서버에는 `mcpb`가 더 자연스러움.
+> **이 경로(1B)는 별도 빌드 작업이 필요** — 오너 승인 시 진행.
 
 ## 2. 디렉터리 / awesome 리스트 (수동 등재 — 전부 점유)
 
@@ -72,13 +93,11 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 
 ## 체크리스트
 
-- [ ] PyPI에 `jiphyeonjeon-mcp` 게시
-- [x] README에 `mcp-name` 마커
-- [x] `server.json` 작성 (스키마 2025-12-11)
-- [ ] `mcp-publisher validate` 통과
-- [ ] 공식 Registry 발행
-- [ ] Glama/Smithery/mcp.so/PulseMCP/LobeHub/Cline 등재
-- [ ] awesome-mcp-servers PR ×3 + mcpservers.org
+- [x] ~~PyPI에 `jiphyeonjeon-mcp` 게시~~ — **제외 결정**(2026-06-18). 공식 레지스트리는 `mcpb`로 대체
+- [x] README에 `mcp-name` 마커 (mcpb에선 불필요하나 유지)
+- [x] `server.json` 작성 (스키마 2025-12-11, pypi 변형 — 보류)
+- [ ] **즉시 가능 (PyPI 불필요):** Glama 자동색인 확인 · awesome-mcp PR ×3 + mcpservers.org · mcp.so/PulseMCP 제출
+- [ ] (오너 승인 시) `.mcpb` 번들 빌드 → GitHub 릴리스 첨부 → `mcpb` 변형 `server.json` → 공식 Registry 발행
 - [x] `CITATION.cff` 추가
 - [x] 툴 어노테이션(`title`/`readOnlyHint`/`destructiveHint`) — Connectors Directory 요건 일부 충족
 - [ ] Zenodo DOI
