@@ -73,7 +73,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 | PulseMCP | https://www.pulsemcp.com | 웹 Submit (수동 검수) |
 | LobeHub | https://lobehub.com/mcp | 플랫폼 제출 |
 | Cline 마켓플레이스 | https://github.com/cline/mcp-marketplace | PR/이슈 (repo URL + 400×400 PNG 로고) |
-| awesome-mcp-servers (punkpeye) | https://github.com/punkpeye/awesome-mcp-servers | PR |
+| ~~awesome-mcp-servers (punkpeye)~~ | https://github.com/punkpeye/awesome-mcp-servers | ⛔ **제외**(2026-06-19, PR #8291 closed) |
 | awesome-mcp-servers (wong2) | https://github.com/wong2/awesome-mcp-servers | PR |
 | awesome-mcp-servers (appcypher) | https://github.com/appcypher/awesome-mcp-servers | PR |
 | mcpservers.org | https://mcpservers.org/submit | 웹 폼 (PR 불가) |
@@ -96,7 +96,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 - [x] ~~PyPI에 `jiphyeonjeon-mcp` 게시~~ — **제외 결정**(2026-06-18). 공식 레지스트리는 `mcpb`로 대체
 - [x] README에 `mcp-name` 마커 (mcpb에선 불필요하나 유지)
 - [x] `server.json` 작성 (스키마 2025-12-11, pypi 변형 — 보류)
-- [~] **진행 중 (PyPI 불필요):** punkpeye awesome PR [#8291](https://github.com/punkpeye/awesome-mcp-servers/pull/8291) ✅생성(머지 대기) · wong2·appcypher ⛔메인테이너 PR 제한(웹폼 제출) · Glama 자동색인 🟡대기 · mcp.so/PulseMCP/Smithery 제출 예정 → 라이브 상태는 [`exposure-status.md`](./exposure-status.md)
+- [~] **진행 중 (PyPI 불필요):** punkpeye ⛔**제외**(PR #8291 closed, 2026-06-19) · wong2·appcypher 웹폼 제출 · Glama 자동색인 🟡대기 · mcp.so/PulseMCP/Smithery 제출 예정 → 라이브 상태는 [`exposure-status.md`](./exposure-status.md)
 - [ ] (오너 승인 시) `.mcpb` 번들 빌드 → GitHub 릴리스 첨부 → `mcpb` 변형 `server.json` → 공식 Registry 발행
 - [x] `CITATION.cff` 추가
 - [x] 툴 어노테이션(`title`/`readOnlyHint`/`destructiveHint`) — Connectors Directory 요건 일부 충족

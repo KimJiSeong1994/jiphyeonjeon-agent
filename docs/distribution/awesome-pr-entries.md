@@ -8,7 +8,9 @@
 
 ---
 
-## 1. punkpeye/awesome-mcp-servers
+## 1. ~~punkpeye/awesome-mcp-servers~~ ⛔ 제외 (2026-06-19)
+> **제외 결정** — PR #8291 철회(closed). 아래 엔트리는 참고용으로만 유지.
+
 **Repo:** https://github.com/punkpeye/awesome-mcp-servers
 **레전드:** 🐍 = Python, 🏠 = Local Service. (집현전은 stdio 로컬 서비스 + Python → `🐍 🏠`)
 **카테고리:** 검색/연구 성격 → "Search" 또는 "Knowledge & Memory" 섹션. (메인테이너가 재분류할 수 있음 — PR 설명에 의견 제시)
