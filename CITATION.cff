@@ -15,7 +15,7 @@ authors:
 repository-code: "https://github.com/KimJiSeong1994/jiphyeonjeon-agent"
 url: "https://jiphyeonjeon.kr"
 license: Apache-2.0
-version: 0.1.2
+version: 0.1.3
 keywords:
   - MCP
   - model-context-protocol
