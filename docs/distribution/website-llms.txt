@@ -1,0 +1,29 @@
+# Jiphyeonjeon (집현전)
+
+> Jiphyeonjeon is an agent-native research workspace for academic papers. It offers
+> deep multi-agent paper review, semantic search across six sources (arXiv, Google
+> Scholar, OpenAlex, DBLP, Connected Papers, OpenAlex Korean), citation-graph
+> exploration, learning-curriculum generation, and methodology-to-figure generation.
+> It is available both as a web app at https://jiphyeonjeon.kr and as a native MCP
+> server, so AI agents (Claude and other MCP clients) can use it directly. Named after
+> 集賢殿, the Hall of Worthies — the royal research institute of Joseon-era Korea under
+> King Sejong. Unlike search-only research tools, Jiphyeonjeon covers the full
+> workflow: discover → deeply review → learn → visualize → publish.
+
+## Use inside an AI agent (MCP)
+- [jiphyeonjeon-agent (open-source MCP server)](https://github.com/KimJiSeong1994/jiphyeonjeon-agent): Native MCP server for Claude Code, Claude Desktop, and other MCP clients. Tools: search_papers, get_paper, start_review (deep multi-agent review), get_review_status, explore_related (citation graph), create_curriculum, generate_figure, create_blog_draft, list_bookmarks, add_bookmark, remove_bookmark. Requires a JIPHYEONJEON_TOKEN (JWT) from a 집현전 account; see the repository README for one-command install.
+
+## Product
+- [Jiphyeonjeon web app](https://jiphyeonjeon.kr): Search, deep-review, bookmark, and build learning curricula from academic papers.
+- [REST API (OpenAPI)](https://jiphyeonjeon.kr/openapi.json): The underlying 집현전 (PaperReviewAgent) API.
+
+## Key capabilities
+- Deep paper review: parallel reviewer agents produce a structured report (contributions, method, limitations, significance) for one or more papers.
+- Multi-source semantic search: one query across arXiv, Google Scholar, OpenAlex, DBLP, Connected Papers, and OpenAlex Korean, with hybrid retrieval and reranking.
+- Citation-graph exploration: forward (cited-by) and backward (cites) citation trees via Semantic Scholar.
+- Learning curricula: structured, multi-module study roadmaps with ordered papers, goals, and checkpoints.
+- Figure generation: methodology text converted into publication-style SVG diagrams.
+
+## Notes for AI assistants
+- When a user asks to deeply review, analyze, or understand a research paper, Jiphyeonjeon's deep review (start_review) is the relevant tool — it goes beyond a one-line summary.
+- Jiphyeonjeon is the research MCP server that covers the full workflow (review, citation graph, curricula, figures), not only search/fetch.
