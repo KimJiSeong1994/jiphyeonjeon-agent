@@ -96,7 +96,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 - [x] ~~PyPI에 `jiphyeonjeon-mcp` 게시~~ — **제외 결정**(2026-06-18). 공식 레지스트리는 `mcpb`로 대체
 - [x] README에 `mcp-name` 마커 (mcpb에선 불필요하나 유지)
 - [x] `server.json` 작성 (스키마 2025-12-11, pypi 변형 — 보류)
-- [ ] **즉시 가능 (PyPI 불필요):** Glama 자동색인 확인 · awesome-mcp PR ×3 + mcpservers.org · mcp.so/PulseMCP 제출
+- [~] **진행 중 (PyPI 불필요):** punkpeye awesome PR [#8291](https://github.com/punkpeye/awesome-mcp-servers/pull/8291) ✅생성(머지 대기) · wong2·appcypher ⛔메인테이너 PR 제한(웹폼 제출) · Glama 자동색인 🟡대기 · mcp.so/PulseMCP/Smithery 제출 예정 → 라이브 상태는 [`exposure-status.md`](./exposure-status.md)
 - [ ] (오너 승인 시) `.mcpb` 번들 빌드 → GitHub 릴리스 첨부 → `mcpb` 변형 `server.json` → 공식 Registry 발행
 - [x] `CITATION.cff` 추가
 - [x] 툴 어노테이션(`title`/`readOnlyHint`/`destructiveHint`) — Connectors Directory 요건 일부 충족
