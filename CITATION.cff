@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "jiphyeonjeon-agent: An agent-native research MCP server for deep paper review"
+abstract: >-
+  An MCP (Model Context Protocol) server that exposes 집현전 (PaperReviewAgent)
+  as native tools for Claude and other AI agents — semantic paper search across
+  six sources (arXiv, Google Scholar, OpenAlex, DBLP, Connected Papers, OpenAlex
+  Korean), deep multi-agent paper review, citation-graph exploration,
+  learning-curriculum generation, and methodology-to-figure generation.
+type: software
+authors:
+  - given-names: Jiseong
+    family-names: Kim
+    alias: KimJiSeong1994
+repository-code: "https://github.com/KimJiSeong1994/jiphyeonjeon-agent"
+url: "https://jiphyeonjeon.kr"
+license: Apache-2.0
+version: 0.1.2
+keywords:
+  - MCP
+  - model-context-protocol
+  - Claude
+  - paper-review
+  - academic-research
+  - arxiv
+  - citation-graph
+  - literature-review

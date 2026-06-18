@@ -10,7 +10,11 @@
   [![Release](https://img.shields.io/github/v/release/KimJiSeong1994/jiphyeonjeon-agent?include_prereleases&style=for-the-badge)](https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases)
 </div>
 
+<!-- mcp-name: io.github.KimJiSeong1994/jiphyeonjeon-agent -->
+
 ---
+
+**Jiphyeonjeon (집현전) is an agent-native research workspace for academic papers.** It exposes 집현전 (PaperReviewAgent) as native MCP tools, so Claude — and any MCP client — can search papers across 6 sources, run **deep multi-agent paper reviews**, explore citation graphs, generate learning curricula, and draft figures, all from one conversation. Unlike search-only research MCP servers, it covers the full workflow: **discover → deeply review → learn → visualize → publish.**
 
 한 번의 Claude 대화로 집현전의 모든 기능 접근. 자신의 계정 권한 그대로, 검색·리뷰·북마크·커리큘럼을 자동 실행합니다.
 
