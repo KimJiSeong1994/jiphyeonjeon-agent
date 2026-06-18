@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -19,7 +20,11 @@ def register(
     if not capabilities.supports("curriculum"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(
+        annotations=ToolAnnotations(
+            title="Create learning curriculum", readOnlyHint=False, openWorldHint=True
+        )
+    )
     async def create_curriculum(
         topic: Annotated[
             str,
@@ -34,11 +39,15 @@ def register(
             Field(ge=2, le=15, description="Number of modules/weeks (2-15, default 5)."),
         ] = 5,
     ) -> dict[str, Any]:
-        """Generate a structured learning curriculum for the given topic.
+        """Generate a structured, multi-module learning curriculum (study roadmap) for a
+        topic — ordered papers, goals, and checkpoints per module.
 
-        Long-running (~30-90s). Returns modules with recommended papers, goals,
-        and checkpoints. The call blocks until completion — for streamed
-        progress, use the SSE variant directly against 집현전 (not exposed as MCP).
+        Use when the user wants a study plan, learning path, reading list, syllabus, or
+        roadmap to learn a field ("how do I learn diffusion models", "GraphRAG 공부 순서
+        짜줘", "study plan for RAG").
+
+        Long-running (~30-90s); the call blocks until completion. Returns modules with
+        recommended papers, goals, and checkpoints.
         """
         body = {
             "topic": topic,

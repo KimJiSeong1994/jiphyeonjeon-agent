@@ -1,6 +1,6 @@
 [project]
 name = "jiphyeonjeon-mcp"
-version = "0.1.2"
+version = "0.1.3"
 description = "MCP server exposing 집현전 (PaperReviewAgent) as Claude agent/skill tools"
 readme = "README.md"
 license = "Apache-2.0"

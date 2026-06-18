@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.KimJiSeong1994/jiphyeonjeon-agent",
+  "title": "Jiphyeonjeon — Research Paper Agent",
+  "description": "Agent-native research MCP: deep arXiv paper review, multi-source semantic search, citation graphs, curricula.",
+  "repository": {
+    "url": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent",
+    "source": "github"
+  },
+  "version": "0.1.3",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "jiphyeonjeon-mcp",
+      "version": "0.1.3",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "JIPHYEONJEON_TOKEN",
+          "description": "JWT bearer token for your 집현전 account (from POST /api/auth/login).",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "JIPHYEONJEON_BASE_URL",
+          "description": "집현전 API base URL. Defaults to https://jiphyeonjeon.kr; use http://localhost:8000 for self-hosting.",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

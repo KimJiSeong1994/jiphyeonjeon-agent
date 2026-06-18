@@ -13,6 +13,7 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -27,7 +28,9 @@ def register(
     if not capabilities.supports("search"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(
+        annotations=ToolAnnotations(title="Search papers", readOnlyHint=True, openWorldHint=True)
+    )
     async def search_papers(
         query: Annotated[
             str,
@@ -67,11 +70,16 @@ def register(
             ),
         ] = True,
     ) -> dict[str, Any]:
-        """Search academic papers via 집현전's hybrid retrieval + reranking pipeline.
+        """Find academic papers on a topic — searches arXiv, Google Scholar, OpenAlex,
+        DBLP, Connected Papers, and OpenAlex Korean in one call via 집현전's hybrid
+        retrieval + reranking.
+
+        Use whenever the user wants to find, look up, discover, or search for papers
+        ("find papers on X", "search arXiv for Y", "관련 논문 찾아줘").
 
         Returns ``{papers, total, query_analysis}`` where ``papers`` is a flattened
-        and deduplicated list from all source-grouped buckets. Use ``get_paper``
-        with a paper id from these results to fetch full metadata.
+        and deduplicated list from all source-grouped buckets. Pass a paper id from
+        these results to ``start_review`` (deep review) or ``get_paper`` (full metadata).
         """
         body: dict[str, Any] = {
             "query": query,
