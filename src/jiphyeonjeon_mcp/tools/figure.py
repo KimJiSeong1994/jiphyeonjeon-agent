@@ -13,6 +13,7 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -27,7 +28,7 @@ def register(
     if not capabilities.supports("autofigure"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(annotations=ToolAnnotations(title="Generate figure", readOnlyHint=True))
     async def generate_figure(
         method_text: Annotated[
             str,
@@ -45,11 +46,15 @@ def register(
             Field(ge=1, le=10, description="LLM refinement passes (1-10, default 1)."),
         ] = 1,
     ) -> dict[str, Any]:
-        """Convert a methodology description into an SVG diagram via AutoFigure.
+        """Turn a methodology description into a publication-style SVG diagram via
+        AutoFigure.
 
-        Returns ``{success, svg_content, figure_png_b64, error}``. If AutoFigure
-        is offline the backend returns HTTP 503 and the caller sees a structured
-        MCP error — retry after the microservice is back.
+        Use when the user wants a figure, diagram, schematic, or visualization of a
+        method or architecture ("draw the architecture", "이 방법론 그림으로 그려줘",
+        "make a diagram of this pipeline").
+
+        Returns ``{success, svg_content, figure_png_b64, error}``. If AutoFigure is
+        offline the backend returns HTTP 503 and the caller sees a structured MCP error.
         """
         body: dict[str, Any] = {
             "method_text": method_text,

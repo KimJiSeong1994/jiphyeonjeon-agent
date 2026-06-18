@@ -14,6 +14,7 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -28,7 +29,7 @@ def register(
     if not capabilities.supports("blog"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(annotations=ToolAnnotations(title="Create blog draft", readOnlyHint=False))
     async def create_blog_draft(
         title: Annotated[
             str,
@@ -51,12 +52,15 @@ def register(
             Field(default=None, description="Optional cover image URL."),
         ] = None,
     ) -> dict[str, Any]:
-        """Create a blog post DRAFT (published=False). Admin JWT required.
+        """Write up a paper or topic as a blog post DRAFT (always saved unpublished).
+        Admin JWT required.
 
-        Returns the created post (id, slug, created_at). If the JWT user is
-        not an admin the server returns 403 and the user sees a clear Korean
-        permission error. Always saves unpublished — admin must manually
-        publish from the web UI.
+        Use when the user wants to turn research into a post, write-up, or research note
+        ("draft a blog post about this paper", "블로그 글로 정리해줘"). Always creates an
+        unpublished draft — the admin reviews and publishes from the web UI.
+
+        Returns the created post (id, slug, created_at). Non-admin JWTs get a clear
+        Korean permission error (403).
         """
         body: dict[str, Any] = {
             "title": title,

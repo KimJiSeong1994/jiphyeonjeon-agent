@@ -14,7 +14,7 @@ from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
 from mcp.shared.exceptions import McpError
-from mcp.types import INVALID_PARAMS, ErrorData
+from mcp.types import INVALID_PARAMS, ErrorData, ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -30,18 +30,22 @@ def register(
     if not capabilities.supports("bookmarks"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(annotations=ToolAnnotations(title="List bookmarks", readOnlyHint=True))
     async def list_bookmarks() -> dict[str, Any]:
-        """List the authenticated user's bookmarks with metadata.
+        """List the authenticated user's saved papers (bookmarks) with metadata.
 
-        Returns ``{bookmarks: [{id, title, topic, tags, created_at, ...}]}``.
-        Each bookmark is scoped to the JWT user — cannot list others'.
+        Use when the user asks about their saved/bookmarked papers, reading list, or
+        library ("show my bookmarks", "내 북마크 보여줘"), or to get a bookmark_id needed by
+        ``explore_related``.
+
+        Returns ``{bookmarks: [{id, title, topic, tags, created_at, ...}]}``. Scoped to
+        the JWT user — cannot list others'.
         """
         async with await client_factory() as client:
             data = await client.get_json("/api/bookmarks", operation="list bookmarks")
         return data if isinstance(data, dict) else {"bookmarks": data}
 
-    @mcp.tool()
+    @mcp.tool(annotations=ToolAnnotations(title="Add bookmark", readOnlyHint=False))
     async def add_bookmark(
         paper_id: Annotated[
             str | None,
@@ -90,7 +94,10 @@ def register(
             Field(default=None, description="Optional note explaining why this is bookmarked."),
         ] = None,
     ) -> dict[str, Any]:
-        """Bookmark a paper for the authenticated user.
+        """Save a paper to the authenticated user's bookmarks/library.
+
+        Use when the user wants to save, bookmark, or keep a paper for later
+        ("save this paper", "이 논문 북마크 해줘").
 
         Usage modes:
         1. ``add_bookmark(paper_id="arxiv-2401.1234")`` — resolves metadata via
@@ -156,7 +163,14 @@ def register(
             )
         return data if isinstance(data, dict) else {"bookmark": data}
 
-    @mcp.tool()
+    @mcp.tool(
+        annotations=ToolAnnotations(
+            title="Remove bookmark",
+            readOnlyHint=False,
+            destructiveHint=True,
+            idempotentHint=True,
+        )
+    )
     async def remove_bookmark(
         bookmark_id: Annotated[
             str,

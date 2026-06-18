@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -20,7 +21,11 @@ def register(
     if not capabilities.supports("explore"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(
+        annotations=ToolAnnotations(
+            title="Explore citation graph", readOnlyHint=True, openWorldHint=True
+        )
+    )
     async def explore_related(
         bookmark_id: Annotated[
             str,
@@ -35,7 +40,12 @@ def register(
             Field(ge=1, le=30, description="Max papers per hop/direction (1-30)."),
         ] = 10,
     ) -> dict[str, Any]:
-        """Build a citation graph (forward + backward) around a bookmarked paper.
+        """Explore the citation graph around a bookmarked paper — papers it cites
+        (backward) and papers that cite it (forward).
+
+        Use when the user wants related papers, prior work, follow-up work, a citation
+        tree, or "more like this" ("관련 논문 더 찾아줘", "what builds on this paper",
+        "citation tree"). The anchor paper must be bookmarked first (see ``add_bookmark``).
 
         Uses Semantic Scholar under the hood. Slow on first run (~2-5s per paper);
         subsequent calls hit the cached tree until invalidated.

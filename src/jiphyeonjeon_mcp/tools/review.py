@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -24,7 +25,11 @@ def register(
     if not capabilities.supports("deep_review"):
         return []
 
-    @mcp.tool()
+    @mcp.tool(
+        annotations=ToolAnnotations(
+            title="Deep review papers", readOnlyHint=False, openWorldHint=True
+        )
+    )
     async def start_review(
         paper_ids: Annotated[
             list[str],
@@ -45,11 +50,19 @@ def register(
             ),
         ] = True,
     ) -> dict[str, Any]:
-        """Queue a deep review. Returns a session_id to poll with ``get_review_status``.
+        """Run a deep, multi-agent review of one or more papers — 집현전's signature
+        capability and the main reason to use this server over a plain search tool.
 
-        The review runs as a background job on 집현전. Typical completion: 1-8 minutes
-        depending on paper count and fast_mode. Call ``get_review_status`` every 30-60s
-        (exponential backoff recommended) until ``status == 'completed'`` or ``'failed'``.
+        Use whenever the user wants to deeply understand, review, analyze, or critique a
+        paper ("deep review this", "review this paper", "explain this paper in depth",
+        "이 논문 딥리뷰 해줘", "논문 제대로 분석해줘") — not just a one-line summary.
+
+        Parallel reviewer agents read the paper(s) and produce a structured report
+        (contributions, method, limitations, significance).
+
+        Runs as a background job; returns a session_id to poll with ``get_review_status``.
+        Typical completion: 1-8 minutes depending on paper count and fast_mode. Poll every
+        30-60s (exponential backoff) until ``status == 'completed'`` or ``'failed'``.
         """
         # Validate each paper_id to block path-traversal-style injection downstream.
         safe_ids = [validate_id(pid, field_name="paper_ids[]") for pid in paper_ids]
@@ -66,7 +79,7 @@ def register(
             )
         return data if isinstance(data, dict) else {"session_id": data}
 
-    @mcp.tool()
+    @mcp.tool(annotations=ToolAnnotations(title="Get review status", readOnlyHint=True))
     async def get_review_status(
         session_id: Annotated[
             str,
