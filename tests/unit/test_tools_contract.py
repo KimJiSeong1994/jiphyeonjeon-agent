@@ -9,7 +9,7 @@ capture the request body, and assert keys.
 from __future__ import annotations
 
 import json as _json
-from typing import Any
+from typing import Any, cast
 
 import httpx
 import respx
@@ -55,7 +55,7 @@ def _build() -> FastMCP:
 
 def _captured(route: respx.Route) -> dict[str, Any]:
     assert route.called, "tool did not make the expected request"
-    return _json.loads(route.calls.last.request.content.decode())
+    return cast(dict[str, Any], _json.loads(route.calls.last.request.content.decode()))
 
 
 @respx.mock
@@ -129,6 +129,27 @@ async def test_start_review_body_matches_backend() -> None:
     assert body["fast_mode"] is False
     # Must NOT send phantom 'query' field that backend would silently drop.
     assert "query" not in body
+
+
+@respx.mock
+async def test_start_review_normalizes_user_facing_arxiv_references() -> None:
+    route = respx.post("http://backend.test/api/deep-review").mock(
+        return_value=httpx.Response(200, json={"session_id": "s1"})
+    )
+    mcp = _build()
+    await mcp.call_tool(
+        "start_review",
+        {
+            "paper_ids": [
+                "https://arxiv.org/abs/2401.12345",
+                "https://arxiv.org/pdf/2401.12346v2.pdf",
+                "cs/0501001",
+            ],
+            "fast_mode": False,
+        },
+    )
+    body = _captured(route)
+    assert body["paper_ids"] == ["2401.12345", "2401.12346v2", "cs/0501001"]
 
 
 @respx.mock
