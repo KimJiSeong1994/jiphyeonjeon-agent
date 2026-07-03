@@ -14,7 +14,7 @@ from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
 from jiphyeonjeon_mcp.tools import ClientFactory
-from jiphyeonjeon_mcp.validators import validate_id
+from jiphyeonjeon_mcp.validators import validate_id, validate_paper_reference
 
 
 def register(
@@ -64,8 +64,10 @@ def register(
         Typical completion: 1-8 minutes depending on paper count and fast_mode. Poll every
         30-60s (exponential backoff) until ``status == 'completed'`` or ``'failed'``.
         """
-        # Validate each paper_id to block path-traversal-style injection downstream.
-        safe_ids = [validate_id(pid, field_name="paper_ids[]") for pid in paper_ids]
+        # ``paper_ids`` are sent in a JSON body, not interpolated into a URL path.
+        # Accept the user-facing references promised by the review workflow
+        # (notably arXiv abs/pdf URLs) while still rejecting traversal/control input.
+        safe_ids = [validate_paper_reference(pid, field_name="paper_ids[]") for pid in paper_ids]
         body = {
             "paper_ids": safe_ids,
             "num_researchers": num_researchers,

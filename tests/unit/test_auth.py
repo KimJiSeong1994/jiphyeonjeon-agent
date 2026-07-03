@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import httpx
 import pytest
 from mcp.shared.exceptions import McpError
@@ -11,8 +13,8 @@ from jiphyeonjeon_mcp.auth import raise_for_http_error
 
 def _make_response(
     status: int,
-    body: dict | None = None,
-    headers: dict | None = None,
+    body: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
 ) -> httpx.Response:
     request = httpx.Request("GET", "http://test/x")
     return httpx.Response(status, json=body or {}, headers=headers or {}, request=request)

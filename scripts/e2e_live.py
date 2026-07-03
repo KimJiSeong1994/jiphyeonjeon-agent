@@ -81,7 +81,9 @@ def main() -> int:
             results.append((name, f"TIMEOUT after {timeout}s: {exc}"))
             return
         if "error" in resp:
-            results.append((name, f"ERROR {resp['error'].get('code')}: {resp['error'].get('message')[:200]}"))
+            code = resp["error"].get("code")
+            message = resp["error"].get("message", "")[:200]
+            results.append((name, f"ERROR {code}: {message}"))
         else:
             result = resp.get("result", {})
             is_error = result.get("isError", False)
@@ -142,7 +144,10 @@ def main() -> int:
         print(f"  {marker} {name}: {outcome[:160]}")
         if outcome.startswith("OK") or "허용된 형식" in outcome:
             ok += 1
-    print(f"\n{ok}/{len(results)} tool calls returned cleanly (including expected validation denials)")
+    print(
+        f"\n{ok}/{len(results)} tool calls returned cleanly "
+        "(including expected validation denials)"
+    )
     return 0 if ok == len(results) else 2
 
 

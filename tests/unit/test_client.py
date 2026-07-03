@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import httpx
 import pytest
 import respx
@@ -42,7 +44,7 @@ async def test_get_json_success() -> None:
 
 @respx.mock
 async def test_post_json_forwards_body() -> None:
-    captured: dict = {}
+    captured: dict[str, Any] = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
         import json as _json
