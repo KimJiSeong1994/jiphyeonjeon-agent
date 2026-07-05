@@ -4,14 +4,16 @@ Admin-only on 집현전 side. Non-admin JWT holders see a 403 which the auth
 layer translates to a clear ``권한 부족`` MCP error.
 
 Backend contract (routers/blog.py PostCreateRequest):
-    title, content, excerpt, tags, thumbnail_url, published (bool, default True)
+    title, content, excerpt, tags, thumbnail_url, published (bool, default True),
+    category ("paper-review" | "engineering", default "engineering")
 We force ``published=False`` so this tool always creates a DRAFT that the
-admin can review and publish from the web UI.
+admin can review and publish from the web UI. Since this tool is used to turn
+papers into posts, we default ``category="paper-review"``.
 """
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
@@ -51,6 +53,17 @@ def register(
             str | None,
             Field(default=None, description="Optional cover image URL."),
         ] = None,
+        category: Annotated[
+            Literal["paper-review", "engineering"],
+            Field(
+                default="paper-review",
+                description=(
+                    "Content type shown as a blog section: 'paper-review' for a "
+                    "deep review of a specific paper (default), or 'engineering' "
+                    "for a 집현전 product / development writeup."
+                ),
+            ),
+        ] = "paper-review",
     ) -> dict[str, Any]:
         """Write up a paper or topic as a blog post DRAFT (always saved unpublished).
         Admin JWT required.
@@ -58,6 +71,9 @@ def register(
         Use when the user wants to turn research into a post, write-up, or research note
         ("draft a blog post about this paper", "블로그 글로 정리해줘"). Always creates an
         unpublished draft — the admin reviews and publishes from the web UI.
+
+        ``category`` defaults to "paper-review" (a review of a specific paper). Pass
+        "engineering" instead when writing a 집현전 product / development note.
 
         Returns the created post (id, slug, created_at). Non-admin JWTs get a clear
         Korean permission error (403).
@@ -67,6 +83,7 @@ def register(
             "content": content,
             "excerpt": excerpt,
             "published": False,
+            "category": category,
         }
         if tags:
             body["tags"] = tags

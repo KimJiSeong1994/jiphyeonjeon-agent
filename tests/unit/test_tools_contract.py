@@ -219,9 +219,26 @@ async def test_create_blog_draft_sends_published_false_not_status() -> None:
     assert body["title"] == "T"
     assert body["published"] is False  # critical — "draft" is implemented via published=False
     assert body["tags"] == ["a"]
+    # Defaults to a paper review since this tool turns papers into posts.
+    assert body["category"] == "paper-review"
     # Must NOT send legacy fields the backend would ignore.
     assert "style" not in body
     assert "status" not in body
+
+
+@respx.mock
+async def test_create_blog_draft_accepts_engineering_category() -> None:
+    route = respx.post("http://backend.test/api/blog/posts").mock(
+        return_value=httpx.Response(200, json={"id": "post1"})
+    )
+    mcp = _build()
+    await mcp.call_tool(
+        "create_blog_draft",
+        {"title": "T", "content": "body " * 10, "category": "engineering"},
+    )
+    body = _captured(route)
+    assert body["category"] == "engineering"
+    assert body["published"] is False
 
 
 @respx.mock
