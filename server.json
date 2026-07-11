@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.KimJiSeong1994/jiphyeonjeon-agent",
   "title": "Jiphyeonjeon — Research Paper Agent",
-  "description": "Agent-native research MCP: deep arXiv paper review, multi-source semantic search, citation graphs, curricula.",
+  "description": "Agent-native research MCP: deep arXiv paper review, semantic search, citation graphs, curricula.",
   "repository": {
     "url": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent",
     "source": "github"
