@@ -13,6 +13,7 @@ papers into posts, we default ``category="paper-review"``.
 
 from __future__ import annotations
 
+import re
 from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
@@ -21,6 +22,49 @@ from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
 from jiphyeonjeon_mcp.tools import ClientFactory
+
+# GEO citability lint. AI answer engines extract self-contained,
+# entity-anchored sentences; drafts that open with "본 문서는…" or bury the
+# headline numbers in tables get skipped. These heuristics do not block draft
+# creation — they surface warnings the calling agent should fix in place.
+_META_LEAD_RE = re.compile(r"^\**\s*(본\s?문서|이\s?논문|이\s?글|본\s?글|해당\s?논문)")
+_SKIP_LINE_RE = re.compile(r"^(#|\*\*(Paper|Abstract|저자|출처)\b|>|!\[|\||-{3,}$)")
+
+
+def _citability_warnings(content: str, category: str) -> list[str]:
+    """Return GEO citability warnings for a paper-review draft body."""
+    if category != "paper-review":
+        return []
+    warnings: list[str] = []
+
+    first_paragraph = ""
+    for raw in content.split("\n"):
+        line = raw.strip()
+        if not line or _SKIP_LINE_RE.match(line):
+            continue
+        first_paragraph = line
+        break
+
+    if _META_LEAD_RE.match(first_paragraph):
+        warnings.append(
+            "정의 리드 없음: 본문 첫 문장이 '본 문서/이 논문'으로 시작합니다. "
+            "'**[엔티티명]**는 …하는 [범주]다. [핵심 수치 1개].' 형식의 "
+            "정의 문장을 맨 앞에 두세요."
+        )
+    elif "**" not in first_paragraph[:120]:
+        warnings.append(
+            "정의 리드 확인 필요: 첫 문단에 굵게 표시된 엔티티명(**X**)이 "
+            "없습니다. 첫 문장의 주어를 리뷰 대상 기법 이름으로 두세요."
+        )
+
+    if "TL;DR" not in content:
+        warnings.append(
+            "TL;DR 없음: Executive Summary 표 바로 아래에 '**TL;DR** — "
+            "(1) 무엇 (2) 헤드라인 수치 (3) 언제 유리한지+한계' 3문장을 "
+            "추가하세요. 각 문장은 엔티티명으로 시작하는 자기완결 문장이어야 "
+            "합니다."
+        )
+    return warnings
 
 
 def register(
@@ -75,8 +119,21 @@ def register(
         ``category`` defaults to "paper-review" (a review of a specific paper). Pass
         "engineering" instead when writing a 집현전 product / development note.
 
-        Returns the created post (id, slug, created_at). Non-admin JWTs get a clear
-        Korean permission error (403).
+        GEO citability requirements for paper-review drafts (AI answer engines
+        extract entity-anchored, self-contained sentences — drafts missing these
+        get created but flagged in ``citability_warnings``):
+        1. 정의 리드: the first body sentence must define the reviewed method
+           with the entity name as subject — "**DeepWalk**는 …하는 방법이다.
+           [핵심 수치 1개]." Never open with "본 문서는/이 논문은".
+        2. TL;DR: 3 self-contained sentences right below the Executive Summary
+           table — (1) 무엇 (2) 헤드라인 수치 (3) 언제 유리한지 + 한계 1개.
+        3. 표-산문 미러: every benchmark table's headline numbers must also
+           appear verbatim in one prose sentence near the table.
+        4. Section leads must not start with dangling 이/그/이것 references.
+
+        Returns the created post (id, slug, created_at) plus
+        ``citability_warnings`` — if non-empty, fix the draft content and
+        update it rather than leaving the warnings unresolved.
         """
         body: dict[str, Any] = {
             "title": title,
@@ -95,6 +152,10 @@ def register(
                 body,
                 operation="create blog draft",
             )
-        return data if isinstance(data, dict) else {"post": data}
+        result = data if isinstance(data, dict) else {"post": data}
+        warnings = _citability_warnings(content, category)
+        if warnings:
+            result = {**result, "citability_warnings": warnings}
+        return result
 
     return ["create_blog_draft"]

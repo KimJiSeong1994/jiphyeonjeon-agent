@@ -242,6 +242,61 @@ async def test_create_blog_draft_accepts_engineering_category() -> None:
 
 
 @respx.mock
+async def test_create_blog_draft_flags_meta_lead_and_missing_tldr() -> None:
+    respx.post("http://backend.test/api/blog/posts").mock(
+        return_value=httpx.Response(200, json={"id": "post1"})
+    )
+    mcp = _build()
+    content = (
+        '# 제목\n\n**Paper:** Someone. "A Paper." 2026.\n\n'
+        "본 문서는 A Paper 논문을 해설한다. " + "내용 " * 20
+    )
+    result = await mcp.call_tool("create_blog_draft", {"title": "T", "content": content})
+    payload = result[1] if isinstance(result, tuple) else result
+    text = str(payload)
+    assert "citability_warnings" in text
+    assert "정의 리드" in text
+    assert "TL;DR" in text
+
+
+@respx.mock
+async def test_create_blog_draft_clean_content_has_no_warnings() -> None:
+    respx.post("http://backend.test/api/blog/posts").mock(
+        return_value=httpx.Response(200, json={"id": "post1"})
+    )
+    mcp = _build()
+    content = (
+        '# 제목\n\n**Paper:** Someone. "A Paper." 2026.\n\n'
+        "**DeepWalk**는 random walk를 문장처럼 다뤄 정점 임베딩을 학습하는 "
+        "방법이다. 라벨 1% 조건에서 Micro-F1을 10%p 앞선다.\n\n"
+        "| 항목 | 값 |\n|---|---|\n| F1 | 35.9 |\n\n"
+        "**TL;DR** — DeepWalk는 비지도 임베딩 기법이다. Micro-F1 35.9를 "
+        "기록했다. 라벨 희소 조건에 유리하지만 가중 그래프는 다루지 못한다.\n"
+    )
+    result = await mcp.call_tool("create_blog_draft", {"title": "T", "content": content})
+    payload = result[1] if isinstance(result, tuple) else result
+    assert "citability_warnings" not in str(payload)
+
+
+@respx.mock
+async def test_create_blog_draft_engineering_skips_citability_lint() -> None:
+    respx.post("http://backend.test/api/blog/posts").mock(
+        return_value=httpx.Response(200, json={"id": "post1"})
+    )
+    mcp = _build()
+    result = await mcp.call_tool(
+        "create_blog_draft",
+        {
+            "title": "T",
+            "content": "본 글은 검색 개선 작업 기록이다. " + "내용 " * 10,
+            "category": "engineering",
+        },
+    )
+    payload = result[1] if isinstance(result, tuple) else result
+    assert "citability_warnings" not in str(payload)
+
+
+@respx.mock
 async def test_generate_figure_sends_paper_title_not_caption() -> None:
     route = respx.post("http://backend.test/api/autofigure/method-to-svg").mock(
         return_value=httpx.Response(200, json={"success": True, "svg_content": "<svg/>"})
