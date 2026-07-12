@@ -248,7 +248,7 @@ async def test_create_blog_draft_flags_meta_lead_and_missing_tldr() -> None:
     )
     mcp = _build()
     content = (
-        "# 제목\n\n**Paper:** Someone. \"A Paper.\" 2026.\n\n"
+        '# 제목\n\n**Paper:** Someone. "A Paper." 2026.\n\n'
         "본 문서는 A Paper 논문을 해설한다. " + "내용 " * 20
     )
     result = await mcp.call_tool("create_blog_draft", {"title": "T", "content": content})
@@ -266,7 +266,7 @@ async def test_create_blog_draft_clean_content_has_no_warnings() -> None:
     )
     mcp = _build()
     content = (
-        "# 제목\n\n**Paper:** Someone. \"A Paper.\" 2026.\n\n"
+        '# 제목\n\n**Paper:** Someone. "A Paper." 2026.\n\n'
         "**DeepWalk**는 random walk를 문장처럼 다뤄 정점 임베딩을 학습하는 "
         "방법이다. 라벨 1% 조건에서 Micro-F1을 10%p 앞선다.\n\n"
         "| 항목 | 값 |\n|---|---|\n| F1 | 35.9 |\n\n"
