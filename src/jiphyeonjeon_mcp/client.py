@@ -1,6 +1,6 @@
 """HTTP client wrapping the 집현전 REST API.
 
-One `JiphyeonjeonClient` instance is shared by all tool handlers. It owns the
+Each tool call creates a short-lived `JiphyeonjeonClient`. It owns the
 underlying ``httpx.AsyncClient``, injects the ``Authorization: Bearer`` header
 on every call, and translates non-2xx responses via :mod:`.auth`.
 """
@@ -122,6 +122,7 @@ class JiphyeonjeonClient:
         if self._client is None:
             raise RuntimeError("JiphyeonjeonClient used outside async context manager")
         kwargs: dict[str, Any] = {"params": params, "json": json}
+        effective_timeout = timeout if timeout is not None else self._settings.timeout
         if timeout is not None:
             kwargs["timeout"] = timeout
         try:
@@ -132,7 +133,7 @@ class JiphyeonjeonClient:
                     code=INTERNAL_ERROR,
                     message=(
                         f"집현전 요청 타임아웃 ({operation}): "
-                        f"{self._settings.timeout}s 내 응답 없음. "
+                        f"{effective_timeout}s 내 응답 없음. "
                         "백엔드가 실행 중인지 확인하세요."
                     ),
                 )

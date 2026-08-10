@@ -24,7 +24,7 @@
 
 - **Claude 대화 한 번으로 집현전 6개 소스 검색 (arXiv, Google Scholar, OpenAlex, DBLP, Connected Papers, OpenAlex Korean) 부터 딥리뷰·북마크·커리큘럼까지** — 자연어로 "GraphRAG 논문 5개 찾아서 리뷰해줘" 하면 자동 실행
 - **내 집현전 계정 권한 그대로** — 북마크·리뷰 기록은 내 것만 보이고 수정됨
-- **11개 도구 + 6개 스킬** — Claude가 자연어 요청을 자동으로 매핑하는 에이전트 인터페이스
+- **12개 도구 + 7개 스킬** — Claude가 자연어 요청을 자동으로 매핑하는 에이전트 인터페이스
 - **집현전 버전에 맞춰 노출 도구 집합 자동 조정** — capability negotiation으로 호환성 보장
 - **로컬 머신 stdio — 외부 서버·OAuth 셋업 없이 즉시 동작**
 
@@ -95,7 +95,7 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
 
 ## Features
 
-### Tools (11)
+### Tools (12)
 
 | Tool | What it does | 집현전 엔드포인트 |
 |------|------------|-------------------|
@@ -103,6 +103,7 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
 | `get_paper` | 단일 논문 메타데이터 조회 | `GET /api/papers/{id}` |
 | `start_review` | 논문 딥리뷰 시작 (비동기 → session_id) | `POST /api/deep-review` |
 | `get_review_status` | 리뷰 진행 상태 폴링 | `GET /api/deep-review/status/{id}` |
+| `get_review_report` | 완료된 리뷰 보고서 조회 | `GET /api/deep-review/report/{id}` |
 | `list_bookmarks` | 내 북마크 목록 | `GET /api/bookmarks` |
 | `add_bookmark` | 논문을 북마크 (metadata 직접 지정 가능) | `POST /api/bookmarks/from-paper` |
 | `remove_bookmark` | 북마크 삭제 | `DELETE /api/bookmarks/{id}` |
@@ -111,7 +112,7 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
 | `generate_figure` | 방법론 텍스트 → SVG 다이어그램 | `POST /api/autofigure/method-to-svg` |
 | `create_blog_draft` | 블로그 초안 작성 (admin 권한) | `POST /api/blog/posts` |
 
-### Skills (6)
+### Skills (7)
 
 스킬은 여러 도구를 조합해 복잡한 워크플로우를 자동 실행합니다. `make install-skills`로 설치하면 트리거 키워드가 자동 인식됩니다.
 
@@ -123,6 +124,7 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
 | `/jh:daily-digest` | "오늘 논문", "digest", "브리핑", "daily update" | 북마크 기반 일일 브리핑 생성 |
 | `/jh:explore` | "관련 논문", "citation tree", "more like this" | 특정 논문 주변 인용 그래프 탐색 |
 | `/jh:draft-blog` | "블로그 초안", "blog draft", "post draft" | 여러 논문 기반 블로그 포스트 작성 |
+| `/jh:update` | "집현전 업데이트", "jiphyeonjeon update" | 안전한 in-place 업데이트 + 스킬 재설치 |
 
 스킬 설치:
 
@@ -132,8 +134,8 @@ make install-skills   # ~/.claude/skills/ 로 복사
 
 ### Safety & Protocol
 
-- **Capability Negotiation** — `GET /api/version` 프로브로 집현전 버전 확인 후 지원 도구만 등록. 구형 서버도 9개 도구로 fallback 호환.
-- **Path Traversal Defense** — 모든 URL 내 id는 정규식 검증 (`[a-zA-Z0-9\-_.:]` 범위, 최대 256자).
+- **Capability Negotiation** — `GET /api/version`의 성공 응답을 그대로 따르고 최소 MCP 버전을 검증. 프로브 실패·구형 서버는 공개 읽기 도구 2개(`search_papers`, `get_paper`)만 보수적으로 등록.
+- **Path Traversal Defense** — 모든 URL 내 id는 정규식 검증 (`[a-zA-Z0-9\-_.:]` 범위, 최대 200자).
 - **Prompt-Injection Framing** — 백엔드 에러 메시지는 `[backend said: ...]` 프레임으로 감싸고 제어문자 제거.
 - **JWT Security** — 토큰은 `SecretStr`로 관리, 로그/repr에 노출 안 함. 24시간 만료, revocation 지원.
 - **Stdio JSON-RPC** — 모든 로그는 stderr로, stdout은 JSON-RPC만 → Claude Code 통신 간섭 없음.
@@ -198,11 +200,11 @@ Claude Code (stdio)
 
 ### search_papers
 - **params**: `query` (필수, min 1자), `max_results` (1-50, 기본 10), `sources` (arxiv/google_scholar/openalex/dblp/connected_papers/openalex_korean, 선택), `year_start` (int, 선택), `year_end` (int, 선택), `fast_mode` (bool, 기본 true)
-- **returns**: `{papers: [{title, authors, abstract, arxiv_id, ...}], total: int, query_analysis: str}`
+- **returns**: `{papers: [중복 제거된 논문], total, by_source, query_analysis, degraded, query_hash, cache_hit, ...}`. 기본 검색 결과 객체는 `add_bookmark(paper=...)`로 바로 전달 가능.
 
 ### get_paper
-- **params**: `paper_id` (arxiv id/DOI/doc_id)
-- **returns**: `{paper: {title, authors, abstract, venue, year, pdf_url, ...}}`
+- **params**: `paper_id` (새 형식 arXiv id 또는 집현전 doc_id; URL 경로에 `/`가 필요한 DOI/구형 arXiv id는 미지원)
+- **returns**: `{title, authors, abstract, venue, year, pdf_url, ...}`
 
 ### start_review
 - **params**: `paper_ids` (list, min 1), `num_researchers` (1-6, 기본 3), `fast_mode` (bool, 기본 true)
@@ -210,14 +212,18 @@ Claude Code (stdio)
 
 ### get_review_status
 - **params**: `session_id` (from start_review)
-- **returns**: `{session_id, status: "processing"|"completed"|"failed", progress: int, report_available: bool}`
+- **returns**: `{session_id, status: "processing"|"completed"|"failed", progress: str|null, report_available: bool}`
+
+### get_review_report
+- **params**: `session_id` (완료된 리뷰 세션)
+- **returns**: `{session_id, report_markdown, report_json, verification_stats, ...}`
 
 ### list_bookmarks
 - **params**: none
 - **returns**: `{bookmarks: [{id, title, topic, tags, created_at, ...}]}`
 
 ### add_bookmark
-- **params**: `paper_id` (선택, auto-resolve metadata) 또는 `title` + `authors` + `year` + `venue` + `arxiv_id` + `doi` (direct metadata), `topic` (기본 "Claude Agent"), `tags`, `context` (선택)
+- **params**: `paper` (`search_papers` 결과 객체, 권장), `paper_id` (선택, indexed paper auto-resolve) 또는 `title` + `authors` + `year` + `venue` + `arxiv_id` + `doi` (direct metadata), `topic` (기본 "Claude Agent"), `tags`, `context` (선택)
 - **returns**: `{bookmark: {id, title, ...}}`
 
 ### remove_bookmark
@@ -237,8 +243,8 @@ Claude Code (stdio)
 - **returns**: `{success: bool, svg_content: str, figure_png_b64: str (optional), error: str (optional)}`
 
 ### create_blog_draft
-- **params**: `title` (1-300자), `content` (markdown, min 10자), `excerpt` (optional), `tags` (optional), `thumbnail_url` (optional)
-- **returns**: `{post: {id, slug, title, published: false, ...}}`
+- **params**: `title` (1-300자), `content` (markdown, min 10자), `excerpt`, `tags`, `thumbnail_url`, `category` (`paper-review` 또는 `engineering`)
+- **returns**: 생성된 초안 필드와 선택적 `citability_warnings`
 
 ---
 
@@ -257,7 +263,7 @@ src/jiphyeonjeon_mcp/
     __init__.py          register_all() orchestrator
     search.py            search_papers
     papers.py            get_paper
-    review.py            start_review, get_review_status
+    review.py            start_review, get_review_status, get_review_report
     bookmarks.py         list_bookmarks, add_bookmark, remove_bookmark
     curriculum.py        create_curriculum
     explore.py           explore_related
@@ -338,11 +344,11 @@ python scripts/e2e_live.py
 
 ## Roadmap
 
-### v0.1.0 (현재)
-- 11 tools + 5 skills (setup 포함 6 skills)
+### v0.1.4 (현재)
+- 12 tools + 7 skills
 - JWT 패스스루 인증
 - stdio transport
-- Capability negotiation + fallback
+- fail-closed capability negotiation + 보수적 fallback
 
 ### v0.2.0 (예정)
 - PAT (Personal Access Token) 지원 — 장기 만료 토큰 옵션

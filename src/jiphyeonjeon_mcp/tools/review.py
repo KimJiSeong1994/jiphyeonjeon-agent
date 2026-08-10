@@ -1,4 +1,4 @@
-"""Deep review tools — start_review + get_review_status (async task_id polling).
+"""Deep review tools — start, poll, and fetch the completed report.
 
 Backend contract (routers/reviews.py DeepReviewRequest):
     paper_ids (required), papers, num_researchers, model, fast_mode
@@ -92,7 +92,7 @@ def register(
 
         Returns ``{session_id, status, progress, report_available, ...}``. When
         ``report_available`` is True, the full markdown report can be fetched
-        via ``/api/deep-review/report/{session_id}``.
+        with ``get_review_report``.
         """
         safe_session = validate_id(session_id, field_name="session_id")
         async with await client_factory() as client:
@@ -102,4 +102,25 @@ def register(
             )
         return data if isinstance(data, dict) else {"raw": data}
 
-    return ["start_review", "get_review_status"]
+    @mcp.tool(annotations=ToolAnnotations(title="Get review report", readOnlyHint=True))
+    async def get_review_report(
+        session_id: Annotated[
+            str,
+            Field(description="Completed session_id returned by start_review."),
+        ],
+    ) -> dict[str, Any]:
+        """Fetch the completed deep-review report.
+
+        Call after ``get_review_status`` returns ``status == 'completed'`` and
+        ``report_available == true``. Returns ``report_markdown`` plus optional
+        structured ``report_json`` and verification metadata.
+        """
+        safe_session = validate_id(session_id, field_name="session_id")
+        async with await client_factory() as client:
+            data = await client.get_json(
+                f"/api/deep-review/report/{safe_session}",
+                operation=f"get review report {safe_session}",
+            )
+        return data if isinstance(data, dict) else {"report_markdown": data}
+
+    return ["start_review", "get_review_status", "get_review_report"]

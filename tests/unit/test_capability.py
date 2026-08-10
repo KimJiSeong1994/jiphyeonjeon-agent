@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 import httpx
+import pytest
 import respx
 from pydantic import SecretStr
 
-from jiphyeonjeon_mcp.capability import BASELINE_CAPABILITIES, discover_capabilities
+from jiphyeonjeon_mcp.capability import (
+    BASELINE_CAPABILITIES,
+    IncompatibleClientError,
+    discover_capabilities,
+    ensure_client_compatible,
+)
 from jiphyeonjeon_mcp.config import Settings
 
 
@@ -65,9 +71,41 @@ async def test_malformed_response_falls_back() -> None:
 
 
 @respx.mock
-async def test_empty_capabilities_uses_baseline() -> None:
+async def test_empty_capabilities_is_authoritative() -> None:
     respx.get("http://backend.test/api/version").mock(
         return_value=httpx.Response(200, json={"version": "2.0", "capabilities": []})
     )
     caps = await discover_capabilities(_settings())
+    assert caps.capabilities == frozenset()
+
+
+@respx.mock
+async def test_invalid_capability_shape_falls_back() -> None:
+    respx.get("http://backend.test/api/version").mock(
+        return_value=httpx.Response(200, json={"version": "2.0", "capabilities": "search"})
+    )
+    caps = await discover_capabilities(_settings())
     assert caps.capabilities == BASELINE_CAPABILITIES
+
+
+def test_newer_minimum_client_is_rejected() -> None:
+    from jiphyeonjeon_mcp.capability import ServerCapabilities
+
+    caps = ServerCapabilities(
+        version="2.0",
+        capabilities=frozenset({"search"}),
+        mcp_min_client="9.0.0",
+    )
+    with pytest.raises(IncompatibleClientError, match="9.0.0"):
+        ensure_client_compatible(caps, client_version="0.1.4")
+
+
+def test_compatible_minimum_client_is_accepted() -> None:
+    from jiphyeonjeon_mcp.capability import ServerCapabilities
+
+    caps = ServerCapabilities(
+        version="1.1",
+        capabilities=frozenset({"search"}),
+        mcp_min_client="0.1.0",
+    )
+    ensure_client_compatible(caps, client_version="0.1.4")

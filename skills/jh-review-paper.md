@@ -29,13 +29,15 @@ description: 집현전으로 논문을 딥리뷰한다. arxiv URL/ID 또는 검�
 
 4. **폴링 (기다리기 선택 시)**
    - `get_review_status({session_id})` 를 exponential backoff 로 호출: 15s → 30s → 60s → 90s (상한).
-   - 각 폴링 결과의 `stage` / `progress` 를 사용자에게 한 문장씩 전달 ("방법론 분석 중 60%..." 식).
+   - 각 폴링 결과의 `progress` 를 사용자에게 한 문장씩 전달 ("방법론 분석 중..." 식).
    - `status == "completed"` 또는 `"failed"` 까지 반복.
    - 총 소요 시간 상한 10분. 초과 시 사용자에게 "아직 진행 중, 나중에 세션 id XXX 로 다시 확인하세요" 안내.
 
-5. **리뷰 표시**
-   - 완료되면 응답의 `report` / `report_markdown` 을 TL;DR (3-5 bullet) + 핵심 섹션으로 요약.
-   - 전체 마크다운은 너무 길면 길이 제한 후 "전체 보기: /api/deep-review/report/{session_id}" 링크 제공.
+5. **리뷰 보고서 조회 및 표시**
+   - 완료되고 `report_available == true` 이면 `get_review_report({session_id})` 를 호출.
+   - 반환된 `report_markdown` 을 TL;DR (3-5 bullet) + 핵심 섹션으로 요약.
+   - 전체 마크다운이 길면 핵심만 표시하되, 상대 API URL 대신 `session_id` 를 함께 제공해
+     나중에 `get_review_report` 로 다시 조회할 수 있게 한다.
 
 ## 실패 처리
 - `status == "failed"`: reason 을 그대로 보여주고 재시도 제안 (fast_mode 로 전환 가능).
@@ -43,4 +45,6 @@ description: 집현전으로 논문을 딥리뷰한다. arxiv URL/ID 또는 검�
 - 429: Retry-After 만큼 대기 후 한 번만 재시도.
 
 ## 북마크 제안
-리뷰 성공 후 사용자에게 "이 논문 북마크 해둘까요?" 묻고, 동의 시 `add_bookmark({paper_id, topic})` 호출.
+리뷰 성공 후 사용자에게 "이 논문 북마크 해둘까요?" 묻는다. 동의하면 검색 단계에서
+보존한 논문 객체가 있을 때 `add_bookmark({paper_id, paper: 선택한_논문_객체, topic})` 로 호출한다.
+직접 URL 리뷰라 논문 객체가 없다면 보고서의 제목·저자·연도·arXiv ID를 명시적 메타데이터로 전달한다.

@@ -12,7 +12,7 @@
 ## 0. 전제조건
 
 1. **공개 GitHub repo.** Glama 자동색인·awesome PR·Show HN 검수의 전제. (이미 공개)
-2. **GitHub 네임스페이스.** 공식 레지스트리 사용 시 서버 이름은 `io.github.<username>/...` 형식. (username = `KimJiSeong1994`, `server.json`의 `name`과 일치)
+2. **GitHub 네임스페이스.** 공식 레지스트리 사용 시 서버 이름은 `io.github.<username>/...` 형식. (username = `KimJiSeong1994`, PyPI 참조 manifest의 `name`과 일치)
 3. **소유권 검증 마커(레지스트리용).** `README.md` 상단에 추가됨 — `mcpb`에선 불필요하나 무해하므로 유지:
    ```html
    <!-- mcp-name: io.github.KimJiSeong1994/jiphyeonjeon-agent -->
@@ -20,8 +20,10 @@
 
 ## 1. 공식 MCP Registry 발행
 
-### 1A. 현재 `server.json` (pypi 변형) — **PyPI 제외 결정으로 보류**
-루트의 [`server.json`](../../server.json)은 `registryType: pypi` 변형이다. PyPI에 게시하지 않기로 했으므로 **이 상태로는 발행 불가**(레지스트리가 PyPI에서 패키지를 못 찾음). PyPI를 다시 허용할 때 사용할 참조 템플릿으로 유지.
+### 1A. PyPI 참조 manifest — **PyPI 제외 결정으로 보류**
+[`server.pypi-reference.json`](./server.pypi-reference.json)은 `registryType: pypi` 참조
+템플릿이다. PyPI에 게시하지 않기로 했으므로 **루트 `server.json`으로 노출하지 않는다**.
+PyPI 게시를 다시 허용할 때만 버전과 패키지 가용성을 검증한 뒤 루트 manifest로 승격한다.
 
 ### 1B. 권장: `mcpb` 변형으로 발행 (PyPI 불필요)
 GitHub 릴리스에 `.mcpb` 번들을 올려 그 URL로 등재한다. 검증은 (a) URL에 `mcp` 포함(`.mcpb` 확장자로 충족) + (b) `server.json`의 `fileSha256`로 이뤄진다 — README 마커·PyPI 불필요.
@@ -32,8 +34,8 @@ npx @anthropic-ai/mcpb init      # manifest.json 생성/편집
 npx @anthropic-ai/mcpb pack      # -> jiphyeonjeon-agent.mcpb
 
 # 2) GitHub 릴리스에 첨부
-gh release create v0.1.3 --generate-notes
-gh release upload v0.1.3 jiphyeonjeon-agent.mcpb
+gh release create v0.1.4 --generate-notes
+gh release upload v0.1.4 jiphyeonjeon-agent.mcpb
 
 # 3) sha256 계산 → server.json(mcpb 변형)의 fileSha256 에 기입
 openssl dgst -sha256 jiphyeonjeon-agent.mcpb
@@ -50,7 +52,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 ```json
 {
   "registryType": "mcpb",
-  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.3/jiphyeonjeon-agent.mcpb",
+  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.4/jiphyeonjeon-agent.mcpb",
   "fileSha256": "<openssl 결과>",
   "transport": { "type": "stdio" }
 }
@@ -84,7 +86,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 
 ⚠️ **블로커: 원격 전송 필요.** 현재 stdio 전용 → 디렉터리는 **원격 HTTPS + Streamable HTTP + OAuth 2.0**를 요구한다(README 로드맵 v1.0.0의 remote connector). 추가로 공개 **개인정보처리방침 URL**이 없으면 즉시 반려.
 - 제출: https://clau.de/mcp-directory-submission
-- 요구: 모든 툴에 `title` + `readOnlyHint`/`destructiveHint` 어노테이션. ✅ **완료** — 11개 툴 전부 `ToolAnnotations` 적용(읽기전용 6 / 쓰기 5, `remove_bookmark`는 `destructiveHint=True`+`idempotentHint=True`). 런타임 등록 검증됨.
+- 요구: 모든 툴에 `title` + `readOnlyHint`/`destructiveHint` 어노테이션. ✅ **완료** — 12개 툴 전부 `ToolAnnotations` 적용(읽기전용 7 / 쓰기 5, `remove_bookmark`는 `destructiveHint=True`+`idempotentHint=True`). 런타임 등록 검증됨.
 
 ## 4. 학술 인용 객체화
 
@@ -95,7 +97,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 
 - [x] ~~PyPI에 `jiphyeonjeon-mcp` 게시~~ — **제외 결정**(2026-06-18). 공식 레지스트리는 `mcpb`로 대체
 - [x] README에 `mcp-name` 마커 (mcpb에선 불필요하나 유지)
-- [x] `server.json` 작성 (스키마 2025-12-11, pypi 변형 — 보류)
+- [x] PyPI 참조 manifest를 `docs/distribution/`으로 격리 — 루트 manifest는 실제 `mcpb` 아티팩트 생성 전까지 미제공
 - [~] **진행 중 (PyPI 불필요):** punkpeye ⛔**제외**(PR #8291 closed, 2026-06-19) · wong2·appcypher 웹폼 제출 · Glama 자동색인 🟡대기 · mcp.so/PulseMCP/Smithery 제출 예정 → 라이브 상태는 [`exposure-status.md`](./exposure-status.md)
 - [ ] (오너 승인 시) `.mcpb` 번들 빌드 → GitHub 릴리스 첨부 → `mcpb` 변형 `server.json` → 공식 Registry 발행
 - [x] `CITATION.cff` 추가

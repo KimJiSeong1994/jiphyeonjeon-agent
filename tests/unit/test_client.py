@@ -98,3 +98,19 @@ async def test_delete_returns_none_for_empty_body() -> None:
     async with JiphyeonjeonClient(_settings()) as client:
         data = await client.delete("/api/bookmarks/123", operation="remove bm")
     assert data is None
+
+
+@respx.mock
+async def test_timeout_message_uses_per_call_override() -> None:
+    respx.post("http://backend.test/api/curricula/generate").mock(
+        side_effect=httpx.ReadTimeout("slow")
+    )
+    async with JiphyeonjeonClient(_settings()) as client:
+        with pytest.raises(McpError) as exc_info:
+            await client.post_json(
+                "/api/curricula/generate",
+                {"topic": "x"},
+                operation="generate curriculum",
+                timeout=180.0,
+            )
+    assert "180.0s" in str(exc_info.value)

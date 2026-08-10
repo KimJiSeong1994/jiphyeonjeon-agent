@@ -17,6 +17,8 @@ import subprocess
 import sys
 import time
 
+from jiphyeonjeon_mcp import __version__
+
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -57,7 +59,9 @@ def main() -> int:
         },
     })
     init_resp = recv()
-    print("initialize ->", init_resp and init_resp.get("result", {}).get("serverInfo"))
+    server_info = init_resp and init_resp.get("result", {}).get("serverInfo")
+    print("initialize ->", server_info)
+    assert server_info and server_info.get("version") == __version__
 
     send({"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}})
     send({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})

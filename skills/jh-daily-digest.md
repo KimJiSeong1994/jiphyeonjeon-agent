@@ -12,7 +12,7 @@ description: 내 북마크와 관심 주제 기반 일일 논문 브리핑을 �
    - 각 북마크의 `topic` 필드로 사용자 관심사를 파악.
 
 2. **주제별 신규 논문 검색**
-   - 각 고유 `topic` 에 대해 `search_papers({query: topic, limit: 5, year_from: 올해})` 호출.
+   - 각 고유 `topic` 에 대해 `search_papers({query: topic, max_results: 5, year_start: 올해})` 호출.
    - 이미 북마크된 paper_id 는 중복 제거.
 
 3. **요약 제시**

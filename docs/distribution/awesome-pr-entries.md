@@ -56,7 +56,7 @@ Adds **jiphyeonjeon-agent**, an open-source Python MCP server (stdio) that expos
 
 Unlike search/fetch-only research servers, it covers the full research workflow:
 - `search_papers` — semantic search across arXiv, Google Scholar, OpenAlex, DBLP, Connected Papers, OpenAlex Korean
-- `start_review` / `get_review_status` — deep multi-agent paper review (contributions, method, limitations)
+- `start_review` / `get_review_status` / `get_review_report` — complete deep multi-agent paper review workflow (contributions, method, limitations)
 - `explore_related` — citation-graph exploration (cites / cited-by)
 - `create_curriculum` — structured learning roadmaps
 - `generate_figure` — methodology → SVG diagram

@@ -27,7 +27,9 @@ description: 하나 이상의 논문을 바탕으로 블로그 초안을 작성�
    - 거절 시 저장하지 않고 종료.
 
 4. **저장**
-   - 승인 후 `create_blog_draft({title, content, tags, style})` 호출.
+   - 승인 후 논문 리뷰는 `create_blog_draft({title, content, tags, category: "paper-review"})`,
+     제품·개발 글은 `category: "engineering"` 으로 호출.
+   - 반환된 `citability_warnings` 가 있으면 경고를 해소한 본문으로 다시 저장한다.
    - 반환된 post id / slug / 관리 URL 을 표시.
 
 ## 실패 처리

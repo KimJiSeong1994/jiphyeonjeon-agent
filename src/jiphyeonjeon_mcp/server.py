@@ -20,7 +20,12 @@ from collections.abc import Awaitable, Callable
 from mcp.server.fastmcp import FastMCP
 
 from jiphyeonjeon_mcp import __version__
-from jiphyeonjeon_mcp.capability import ServerCapabilities, discover_capabilities
+from jiphyeonjeon_mcp.capability import (
+    IncompatibleClientError,
+    ServerCapabilities,
+    discover_capabilities,
+    ensure_client_compatible,
+)
 from jiphyeonjeon_mcp.client import JiphyeonjeonClient
 from jiphyeonjeon_mcp.config import Settings, load_settings
 from jiphyeonjeon_mcp.tools import register_all
@@ -88,6 +93,9 @@ def _build_server(
             "JIPHYEONJEON_TOKEN."
         ),
     )
+    # FastMCP 1.x otherwise advertises the SDK version in initialize.serverInfo.
+    # The low-level server exposes the implementation-version field directly.
+    mcp._mcp_server.version = __version__
     factory = _build_client_factory(settings)
     registered = register_all(mcp, factory, capabilities)
     return mcp, registered
@@ -115,6 +123,11 @@ def main() -> None:
         )
 
     capabilities, update_result = asyncio.run(_boot_probes())
+    try:
+        ensure_client_compatible(capabilities)
+    except IncompatibleClientError as exc:
+        logger.error("MCP/backend compatibility check failed: %s", exc)
+        raise SystemExit(1) from exc
     logger.info(
         "Negotiated capabilities (server=%s): %s",
         capabilities.version,
