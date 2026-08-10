@@ -2,17 +2,17 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.KimJiSeong1994/jiphyeonjeon-agent",
   "title": "Jiphyeonjeon — Research Paper Agent",
-  "description": "Agent-native research MCP: deep arXiv paper review, semantic search, citation graphs, curricula.",
+  "description": "REFERENCE ONLY: PyPI package manifest retained for a future publishing decision.",
   "repository": {
     "url": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent",
     "source": "github"
   },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "jiphyeonjeon-mcp",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "transport": {
         "type": "stdio"
       },

@@ -15,16 +15,20 @@ import logging
 from dataclasses import dataclass
 
 import httpx
+from packaging.version import InvalidVersion, Version
 
+from jiphyeonjeon_mcp import __version__
 from jiphyeonjeon_mcp.config import Settings
 
 logger = logging.getLogger(__name__)
 
-# Tools that were present before capability negotiation existed.
-# Safe to register unconditionally on any 집현전 version >= 1.1.0.
-BASELINE_CAPABILITIES: frozenset[str] = frozenset(
-    {"search", "papers", "deep_review", "bookmarks", "curriculum", "explore"}
-)
+# Conservative, public/read-only surface used only when capability discovery is
+# unavailable. Mutating and long-running tools require an explicit advertisement.
+BASELINE_CAPABILITIES: frozenset[str] = frozenset({"search", "papers"})
+
+
+class IncompatibleClientError(RuntimeError):
+    """Raised when the backend requires a newer MCP adapter version."""
 
 
 @dataclass(frozen=True)
@@ -75,7 +79,12 @@ async def discover_capabilities(settings: Settings) -> ServerCapabilities:
 
     try:
         data = response.json()
-        caps = frozenset(data.get("capabilities") or [])
+        if not isinstance(data, dict):
+            raise ValueError("response is not a JSON object")
+        raw_caps = data.get("capabilities")
+        if not isinstance(raw_caps, list) or not all(isinstance(cap, str) for cap in raw_caps):
+            raise ValueError("capabilities must be a list of strings")
+        caps = frozenset(raw_caps)
         version = str(data.get("version", "unknown"))
         mcp_min = str(data.get("mcp_min_client", "0.1.0"))
     except Exception as exc:
@@ -87,6 +96,27 @@ async def discover_capabilities(settings: Settings) -> ServerCapabilities:
 
     return ServerCapabilities(
         version=version,
-        capabilities=caps or BASELINE_CAPABILITIES,
+        capabilities=caps,
         mcp_min_client=mcp_min,
     )
+
+
+def ensure_client_compatible(
+    capabilities: ServerCapabilities,
+    *,
+    client_version: str = __version__,
+) -> None:
+    """Reject a backend that requires a newer adapter than this process provides."""
+    try:
+        current = Version(client_version)
+        required = Version(capabilities.mcp_min_client)
+    except InvalidVersion as exc:
+        raise IncompatibleClientError(
+            "Invalid MCP compatibility version from backend: "
+            f"client={client_version!r}, required={capabilities.mcp_min_client!r}"
+        ) from exc
+    if current < required:
+        raise IncompatibleClientError(
+            f"Backend {capabilities.version} requires jiphyeonjeon-mcp "
+            f">={required}, but this process is {current}. Upgrade the MCP adapter."
+        )

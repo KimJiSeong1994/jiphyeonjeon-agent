@@ -53,7 +53,17 @@ def register(
                 default=None,
                 description=(
                     "집현전 paper id to auto-resolve metadata via GET /api/papers/{id}. "
-                    "Required unless ``title`` is provided explicitly."
+                    "Required only when neither ``paper`` metadata nor ``title`` is provided."
+                ),
+            ),
+        ] = None,
+        paper: Annotated[
+            dict[str, Any] | None,
+            Field(
+                default=None,
+                description=(
+                    "Paper metadata object returned by search_papers. When it contains a title, "
+                    "bookmark creation skips the backend paper-index lookup."
                 ),
             ),
         ] = None,
@@ -102,14 +112,17 @@ def register(
         Usage modes:
         1. ``add_bookmark(paper_id="arxiv-2401.1234")`` — resolves metadata via
            GET /api/papers/{paper_id}, then POSTs from-paper.
-        2. ``add_bookmark(title=..., authors=..., year=...)`` — caller supplies
+        2. ``add_bookmark(paper=<search result>)`` — uses search metadata directly,
+           even when fast search did not save the paper to the backend index.
+        3. ``add_bookmark(title=..., authors=..., year=...)`` — caller supplies
            metadata directly (useful when paper not yet in 집현전 index).
-        3. Mix — explicit fields override resolved ones.
+        4. Mix — explicit fields override supplied or resolved metadata.
 
         Wraps ``POST /api/bookmarks/from-paper`` which requires at minimum ``title``.
         """
-        resolved: dict[str, Any] = {}
-        if paper_id is not None:
+        resolved: dict[str, Any] = dict(paper or {})
+        should_resolve = paper_id is not None and not (title or resolved.get("title"))
+        if should_resolve and paper_id is not None:
             safe_pid = validate_id(paper_id, field_name="paper_id")
             async with await client_factory() as client:
                 paper_meta = await client.get_json(

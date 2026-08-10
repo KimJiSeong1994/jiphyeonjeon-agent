@@ -114,6 +114,35 @@ async def test_search_papers_flattens_source_groups() -> None:
 
 
 @respx.mock
+async def test_search_papers_deduplicates_and_preserves_backend_metadata() -> None:
+    respx.post("http://backend.test/api/search").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "results": {
+                    "arxiv": [{"id": "2401.12345", "title": "Same"}],
+                    "openalex": [{"arxiv_id": "2401.12345", "title": "Same"}],
+                },
+                "total": 2,
+                "degraded": ["ranker_unavailable"],
+                "query_hash": "query-1",
+                "cache_hit": True,
+            },
+        )
+    )
+    mcp = _build()
+    result = await mcp.call_tool("search_papers", {"query": "x"})
+    payload = result[1] if isinstance(result, tuple) else getattr(result, "structuredContent", None)
+    assert payload is not None
+    assert len(payload["papers"]) == 1
+    assert payload["total"] == 1
+    assert payload["source_total"] == 2
+    assert payload["degraded"] == ["ranker_unavailable"]
+    assert payload["query_hash"] == "query-1"
+    assert payload["cache_hit"] is True
+
+
+@respx.mock
 async def test_start_review_body_matches_backend() -> None:
     route = respx.post("http://backend.test/api/deep-review").mock(
         return_value=httpx.Response(200, json={"session_id": "s1"})
@@ -150,6 +179,23 @@ async def test_start_review_normalizes_user_facing_arxiv_references() -> None:
     )
     body = _captured(route)
     assert body["paper_ids"] == ["2401.12345", "2401.12346v2", "cs/0501001"]
+
+
+@respx.mock
+async def test_get_review_report_fetches_completed_markdown() -> None:
+    route = respx.get("http://backend.test/api/deep-review/report/session-1").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "session_id": "session-1",
+                "report_markdown": "# Review\n\nResult",
+                "report_json": {"summary": "Result"},
+            },
+        )
+    )
+    mcp = _build()
+    await mcp.call_tool("get_review_report", {"session_id": "session-1"})
+    assert route.called
 
 
 @respx.mock
@@ -203,6 +249,32 @@ async def test_add_bookmark_with_explicit_title_skips_resolution() -> None:
     body = _captured(post_route)
     assert body["title"] == "Explicit Title"
     assert body["authors"] == ["X"]
+
+
+@respx.mock
+async def test_add_bookmark_accepts_search_result_metadata_without_index_lookup() -> None:
+    resolve_route = respx.get("http://backend.test/api/papers/2401.12345")
+    post_route = respx.post("http://backend.test/api/bookmarks/from-paper").mock(
+        return_value=httpx.Response(200, json={"id": "bm3"})
+    )
+    mcp = _build()
+    await mcp.call_tool(
+        "add_bookmark",
+        {
+            "paper_id": "2401.12345",
+            "paper": {
+                "title": "Search Result",
+                "authors": ["A"],
+                "year": 2026,
+                "arxiv_id": "2401.12345",
+            },
+            "topic": "t",
+        },
+    )
+    assert not resolve_route.called
+    body = _captured(post_route)
+    assert body["title"] == "Search Result"
+    assert body["arxiv_id"] == "2401.12345"
 
 
 @respx.mock

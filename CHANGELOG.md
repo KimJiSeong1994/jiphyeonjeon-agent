@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.4 — 2026-08-10
+
+MCP/API contract completion and consistency hardening.
+
+- Added `get_review_report` so deep-review workflows complete entirely through MCP.
+- Added direct search-result metadata support to `add_bookmark`, avoiding index lookup failures
+  after default fast searches.
+- Made successful capability responses authoritative, enforced `mcp_min_client`, and reduced the
+  unavailable/legacy fallback to public read-only tools.
+- Deduplicated flattened search results while preserving backend quality and timing metadata.
+- Aligned bundled skills, runtime server version, README contracts, and distribution guidance.
+
 ## v0.1.3 — 2026-06-18
 
 Agent discoverability & distribution. No behavior change — tool signatures,

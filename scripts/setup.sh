@@ -7,7 +7,7 @@
 #   3. Prompt for 집현전 username/password and obtain a JWT via /api/auth/login
 #      (or accept a pre-issued token via JIPHYEONJEON_TOKEN env)
 #   4. Register the server with Claude Code (`claude mcp add jiphyeonjeon ...`)
-#   5. Install the five `/jh:*` skills into ~/.claude/skills/
+#   5. Install the seven `/jh:*` skills into ~/.claude/skills/
 #
 # Safe to re-run: each step is idempotent where possible.
 

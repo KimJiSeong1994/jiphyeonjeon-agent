@@ -3,9 +3,9 @@
 Backend contract (routers/search.py SearchRequest):
     query, max_results, sources, sort_by, year_start, year_end, author,
     category, fast_mode, save_papers, collect_references, extract_texts
-Response (SearchResponse): ``{results: {source: [papers]}, total, query_analysis}``.
-We flatten ``results`` into a single ranked list so Claude doesn't have to
-inspect per-source grouping.
+Response (SearchResponse): ``{results: {source: [papers]}, total, query_analysis, ...metadata}``.
+We flatten ``results`` into a single deduplicated list while preserving source
+grouping and response metadata.
 """
 
 from __future__ import annotations
@@ -18,6 +18,25 @@ from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
 from jiphyeonjeon_mcp.tools import ClientFactory
+
+
+def _paper_identities(paper: dict[str, Any]) -> set[str]:
+    """Return stable cross-source identifiers used for deterministic deduplication."""
+    identities: set[str] = set()
+    for key in ("doc_id", "id", "arxiv_id", "doi"):
+        value = paper.get(key)
+        if isinstance(value, str) and value.strip():
+            normalized = value.strip().lower()
+            for prefix in ("arxiv:", "arxiv-", "doi:"):
+                if normalized.startswith(prefix):
+                    normalized = normalized.removeprefix(prefix)
+            identities.add(normalized)
+    if not identities:
+        title = paper.get("title")
+        year = paper.get("year")
+        if isinstance(title, str) and title.strip():
+            identities.add(f"title:{' '.join(title.lower().split())}|year:{year or ''}")
+    return identities
 
 
 def register(
@@ -77,9 +96,11 @@ def register(
         Use whenever the user wants to find, look up, discover, or search for papers
         ("find papers on X", "search arXiv for Y", "관련 논문 찾아줘").
 
-        Returns ``{papers, total, query_analysis}`` where ``papers`` is a flattened
-        and deduplicated list from all source-grouped buckets. Pass a paper id from
-        these results to ``start_review`` (deep review) or ``get_paper`` (full metadata).
+        Returns ``{papers, total, by_source, ...metadata}`` where ``papers`` is a
+        flattened and deduplicated list from all source-grouped buckets. Backend
+        quality/diagnostic fields such as ``degraded``, ``query_hash``, and timing
+        metadata are preserved. Pass a paper object directly to ``add_bookmark`` or
+        a paper id to ``start_review``.
         """
         body: dict[str, Any] = {
             "query": query,
@@ -110,18 +131,30 @@ def register(
             grouped = data.get("results") or {}
             if isinstance(grouped, dict):
                 flat: list[dict[str, Any]] = []
+                seen: set[str] = set()
                 for source_name, papers in grouped.items():
                     if isinstance(papers, list):
                         for paper in papers:
                             if isinstance(paper, dict):
-                                paper.setdefault("source", source_name)
-                                flat.append(paper)
-                return {
-                    "papers": flat,
-                    "total": data.get("total", len(flat)),
-                    "query_analysis": data.get("query_analysis"),
-                    "by_source": grouped,
-                }
+                                item = dict(paper)
+                                item.setdefault("source", source_name)
+                                identities = _paper_identities(item)
+                                if identities and identities & seen:
+                                    continue
+                                seen.update(identities)
+                                flat.append(item)
+                result = {key: value for key, value in data.items() if key != "results"}
+                source_total = data.get("total", len(flat))
+                result.update(
+                    {
+                        "papers": flat,
+                        "total": len(flat),
+                        "by_source": grouped,
+                    }
+                )
+                if source_total != len(flat):
+                    result["source_total"] = source_total
+                return result
             # Some endpoints may already return a flat list in `results`.
             if isinstance(grouped, list):
                 return {"papers": grouped, "total": data.get("total", len(grouped))}

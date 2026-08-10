@@ -25,11 +25,11 @@ def register(
     async def get_paper(
         paper_id: Annotated[
             str,
-            Field(description="집현전 doc_id, arxiv id, or DOI. Raw string — no URL escaping."),
+            Field(description="집현전 doc_id or new-style arXiv id. Raw path-safe string."),
         ],
     ) -> dict[str, Any]:
-        """Fetch full metadata for one specific, known paper (by arXiv id, DOI, or
-        집현전 doc_id).
+        """Fetch full metadata for one specific, indexed paper by new-style arXiv id
+        or 집현전 doc_id.
 
         Use when the user references a single concrete paper and you already have its id
         ("get details for arXiv 2310.06825", "이 논문 정보 보여줘"). To discover papers from a

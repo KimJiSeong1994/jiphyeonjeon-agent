@@ -52,14 +52,15 @@ def _build_mcp_with_all_tools() -> tuple[FastMCP, list[str]]:
     return mcp, registered
 
 
-def test_all_eleven_tools_registered() -> None:
+def test_all_twelve_tools_registered() -> None:
     _mcp, registered = _build_mcp_with_all_tools()
-    assert len(registered) == 11
+    assert len(registered) == 12
     expected = {
         "search_papers",
         "get_paper",
         "start_review",
         "get_review_status",
+        "get_review_report",
         "list_bookmarks",
         "add_bookmark",
         "remove_bookmark",
@@ -104,6 +105,10 @@ async def test_tool_schema_contains_expected_fields() -> None:
     assert "fast_mode" in props_sr
     assert "query" not in props_sr  # removed — backend doesn't accept it
 
+    gp = by_name["get_paper"]
+    paper_id_description = gp.inputSchema["properties"]["paper_id"]["description"]
+    assert "DOI" not in paper_id_description
+
     rb = by_name["remove_bookmark"]
     assert "DESTRUCTIVE" in (rb.description or "") or "복구 불가" in (rb.description or "")
 
@@ -115,7 +120,7 @@ async def test_search_papers_end_to_end() -> None:
         return_value=httpx.Response(200, json={"papers": [{"id": "p1", "title": "Survey"}]})
     )
     mcp, _ = _build_mcp_with_all_tools()
-    result = await mcp.call_tool("search_papers", {"query": "LLM agents", "limit": 5})
+    result = await mcp.call_tool("search_papers", {"query": "LLM agents", "max_results": 5})
     # call_tool returns a tuple (content, structured) in recent mcp versions;
     # handle both shapes defensively.
     if isinstance(result, tuple):
