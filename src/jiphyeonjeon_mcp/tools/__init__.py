@@ -37,4 +37,23 @@ def register_all(
     registered: list[str] = []
     for module in (search, papers, review, bookmarks, curriculum, explore, figure, blog):
         registered.extend(module.register(mcp, client_factory, capabilities))
+    _forbid_unknown_tool_arguments(mcp, registered)
     return registered
+
+
+def _forbid_unknown_tool_arguments(mcp: FastMCP, names: list[str]) -> None:
+    """Make FastMCP/Pydantic reject rather than discard undeclared arguments.
+
+    MCP 1.x builds a separate Pydantic argument model per decorated function,
+    with Pydantic's default ``extra='ignore'`` behavior. Tightening each model
+    after registration keeps runtime validation and advertised JSON Schema in
+    sync (`additionalProperties: false`).
+    """
+    for name in names:
+        tool = mcp._tool_manager.get_tool(name)
+        if tool is None:  # pragma: no cover - list comes from successful registration
+            continue
+        arg_model = tool.fn_metadata.arg_model
+        arg_model.model_config["extra"] = "forbid"
+        arg_model.model_rebuild(force=True)
+        tool.parameters = arg_model.model_json_schema(by_alias=True)

@@ -26,10 +26,15 @@ description: 하나 이상의 논문을 바탕으로 블로그 초안을 작성�
    - "게시(publish) 말고 draft 로만 저장합니다. 승인하시겠어요?"
    - 거절 시 저장하지 않고 종료.
 
-4. **저장**
-   - 승인 후 논문 리뷰는 `create_blog_draft({title, content, tags, category: "paper-review"})`,
+4. **사전 검증 및 저장**
+   - 승인 후 먼저 논문 리뷰는 `check_blog_draft({content, category: "paper-review"})`,
+     제품·개발 글은 `category: "engineering"` 으로 호출한다.
+   - `ready: false`이면 `citability_warnings`를 모두 해소하고 다시 검사한다. 사용자가 명시적으로
+     경고 포함 저장을 요청하지 않은 한 `allow_citability_warnings: true`를 사용하지 않는다.
+   - 검증 통과 후 논문 리뷰는 `create_blog_draft({title, content, tags, category: "paper-review"})`,
      제품·개발 글은 `category: "engineering"` 으로 호출.
-   - 반환된 `citability_warnings` 가 있으면 경고를 해소한 본문으로 다시 저장한다.
+   - 생성 뒤 수정이 필요하면 새 글을 중복 생성하지 말고
+     `update_blog_draft({post_id, content, category})`로 기존 비공개 초안을 수정한다.
    - 반환된 post id / slug / 관리 URL 을 표시.
 
 ## 실패 처리

@@ -12,8 +12,10 @@ import json as _json
 from typing import Any, cast
 
 import httpx
+import pytest
 import respx
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 from pydantic import SecretStr
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -285,7 +287,15 @@ async def test_create_blog_draft_sends_published_false_not_status() -> None:
     mcp = _build()
     await mcp.call_tool(
         "create_blog_draft",
-        {"title": "T", "content": "body " * 10, "tags": ["a"]},
+        {
+            "title": "T",
+            "content": (
+                "**DeepWalk**는 그래프 임베딩 방법이다. Micro-F1 35.9를 기록했다.\n\n"
+                "**TL;DR** — DeepWalk는 비지도 기법이다. DeepWalk는 Micro-F1 35.9를 "
+                "기록했다. DeepWalk는 라벨 희소 조건에 유리하지만 가중 그래프에는 제한이 있다."
+            ),
+            "tags": ["a"],
+        },
     )
     body = _captured(route)
     assert body["title"] == "T"
@@ -314,8 +324,8 @@ async def test_create_blog_draft_accepts_engineering_category() -> None:
 
 
 @respx.mock
-async def test_create_blog_draft_flags_meta_lead_and_missing_tldr() -> None:
-    respx.post("http://backend.test/api/blog/posts").mock(
+async def test_create_blog_draft_blocks_preflight_warnings_before_post() -> None:
+    route = respx.post("http://backend.test/api/blog/posts").mock(
         return_value=httpx.Response(200, json={"id": "post1"})
     )
     mcp = _build()
@@ -323,12 +333,75 @@ async def test_create_blog_draft_flags_meta_lead_and_missing_tldr() -> None:
         '# 제목\n\n**Paper:** Someone. "A Paper." 2026.\n\n'
         "본 문서는 A Paper 논문을 해설한다. " + "내용 " * 20
     )
-    result = await mcp.call_tool("create_blog_draft", {"title": "T", "content": content})
+    with pytest.raises(ToolError) as exc_info:
+        await mcp.call_tool("create_blog_draft", {"title": "T", "content": content})
+    assert "정의 리드" in str(exc_info.value)
+    assert "TL;DR" in str(exc_info.value)
+    assert not route.called
+
+
+async def test_check_blog_draft_returns_read_only_preflight_result() -> None:
+    mcp = _build()
+    result = await mcp.call_tool(
+        "check_blog_draft",
+        {"content": "본 문서는 A Paper 논문을 해설한다. " + "내용 " * 20},
+    )
     payload = result[1] if isinstance(result, tuple) else result
-    text = str(payload)
-    assert "citability_warnings" in text
-    assert "정의 리드" in text
-    assert "TL;DR" in text
+    assert "ready" in str(payload)
+    assert "citability_warnings" in str(payload)
+
+
+@respx.mock
+async def test_create_blog_draft_explicit_override_preserves_warning_result() -> None:
+    route = respx.post("http://backend.test/api/blog/posts").mock(
+        return_value=httpx.Response(200, json={"id": "post1"})
+    )
+    mcp = _build()
+    content = "본 문서는 A Paper 논문을 해설한다. " + "내용 " * 20
+    result = await mcp.call_tool(
+        "create_blog_draft",
+        {"title": "T", "content": content, "allow_citability_warnings": True},
+    )
+    assert route.called
+    assert "citability_warnings" in str(result)
+
+
+@respx.mock
+async def test_update_blog_draft_sends_partial_put_and_keeps_unpublished() -> None:
+    route = respx.put("http://backend.test/api/blog/posts/post1").mock(
+        return_value=httpx.Response(200, json={"id": "post1", "published": False})
+    )
+    mcp = _build()
+    await mcp.call_tool(
+        "update_blog_draft",
+        {
+            "post_id": "post1",
+            "title": "Updated",
+            "category": "engineering",
+        },
+    )
+    assert _captured(route) == {
+        "title": "Updated",
+        "category": "engineering",
+        "published": False,
+    }
+
+
+@respx.mock
+async def test_update_blog_draft_blocks_content_warnings_before_put() -> None:
+    route = respx.put("http://backend.test/api/blog/posts/post1").mock(
+        return_value=httpx.Response(200, json={"id": "post1"})
+    )
+    mcp = _build()
+    with pytest.raises(ToolError, match="사전 검증에 실패"):
+        await mcp.call_tool(
+            "update_blog_draft",
+            {
+                "post_id": "post1",
+                "content": "본 문서는 검증되지 않은 초안이다. " + "내용 " * 10,
+            },
+        )
+    assert not route.called
 
 
 @respx.mock

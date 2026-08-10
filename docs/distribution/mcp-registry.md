@@ -34,8 +34,8 @@ npx @anthropic-ai/mcpb init      # manifest.json 생성/편집
 npx @anthropic-ai/mcpb pack      # -> jiphyeonjeon-agent.mcpb
 
 # 2) GitHub 릴리스에 첨부
-gh release create v0.1.4 --generate-notes
-gh release upload v0.1.4 jiphyeonjeon-agent.mcpb
+gh release create v0.1.5 --generate-notes
+gh release upload v0.1.5 jiphyeonjeon-agent.mcpb
 
 # 3) sha256 계산 → server.json(mcpb 변형)의 fileSha256 에 기입
 openssl dgst -sha256 jiphyeonjeon-agent.mcpb
@@ -52,7 +52,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 ```json
 {
   "registryType": "mcpb",
-  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.4/jiphyeonjeon-agent.mcpb",
+  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.5/jiphyeonjeon-agent.mcpb",
   "fileSha256": "<openssl 결과>",
   "transport": { "type": "stdio" }
 }
@@ -86,7 +86,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 
 ⚠️ **블로커: 원격 전송 필요.** 현재 stdio 전용 → 디렉터리는 **원격 HTTPS + Streamable HTTP + OAuth 2.0**를 요구한다(README 로드맵 v1.0.0의 remote connector). 추가로 공개 **개인정보처리방침 URL**이 없으면 즉시 반려.
 - 제출: https://clau.de/mcp-directory-submission
-- 요구: 모든 툴에 `title` + `readOnlyHint`/`destructiveHint` 어노테이션. ✅ **완료** — 12개 툴 전부 `ToolAnnotations` 적용(읽기전용 7 / 쓰기 5, `remove_bookmark`는 `destructiveHint=True`+`idempotentHint=True`). 런타임 등록 검증됨.
+- 요구: 모든 툴에 `title` + `readOnlyHint`/`destructiveHint` 어노테이션. ✅ **완료** — 14개 툴 전부 `ToolAnnotations` 적용(`remove_bookmark`는 `destructiveHint=True`+`idempotentHint=True`). 런타임 등록 검증됨.
 
 ## 4. 학술 인용 객체화
 

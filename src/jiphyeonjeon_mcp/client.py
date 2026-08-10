@@ -1,8 +1,9 @@
 """HTTP client wrapping the 집현전 REST API.
 
-Each tool call creates a short-lived `JiphyeonjeonClient`. It owns the
-underlying ``httpx.AsyncClient``, injects the ``Authorization: Bearer`` header
-on every call, and translates non-2xx responses via :mod:`.auth`.
+The stdio server owns one long-lived connection pool and gives each tool a
+non-owning borrowed client. Direct/in-memory callers may still use a short-lived
+owning client. Both modes inject the ``Authorization: Bearer`` header and
+translate non-2xx responses via :mod:`.auth`.
 """
 
 from __future__ import annotations
@@ -29,17 +30,25 @@ class JiphyeonjeonClient:
                                           operation="search papers")
     """
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        http_client: httpx.AsyncClient | None = None,
+    ) -> None:
         self._settings = settings
-        self._client: httpx.AsyncClient | None = None
+        self._client = http_client
+        self._owns_client = http_client is None
 
     async def __aenter__(self) -> JiphyeonjeonClient:
-        self._client = httpx.AsyncClient(
-            base_url=self._settings.normalized_base_url,
-            timeout=self._settings.timeout,
-            verify=self._settings.verify_ssl,
-            headers=self._auth_headers(),
-        )
+        if self._client is None:
+            self._client = httpx.AsyncClient(
+                base_url=self._settings.normalized_base_url,
+                timeout=self._settings.timeout,
+                verify=self._settings.verify_ssl,
+                headers=self._auth_headers(),
+            )
+            self._owns_client = True
         return self
 
     async def __aexit__(
@@ -49,8 +58,15 @@ class JiphyeonjeonClient:
         tb: TracebackType | None,
     ) -> None:
         if self._client is not None:
-            await self._client.aclose()
+            if self._owns_client:
+                await self._client.aclose()
             self._client = None
+
+    def borrow(self) -> JiphyeonjeonClient:
+        """Return a non-owning view over this client's open connection pool."""
+        if self._client is None:
+            raise RuntimeError("cannot borrow from a closed JiphyeonjeonClient")
+        return JiphyeonjeonClient(self._settings, http_client=self._client)
 
     def _auth_headers(self) -> dict[str, str]:
         return {
@@ -90,6 +106,19 @@ class JiphyeonjeonClient:
             operation=operation,
             timeout=timeout,
         )
+        if not response.content:
+            return None
+        return response.json()
+
+    async def put_json(
+        self,
+        path: str,
+        body: dict[str, Any],
+        *,
+        operation: str,
+    ) -> Any:
+        """PUT a JSON body to ``path`` and return parsed JSON when present."""
+        response = await self._request("PUT", path, json=body, operation=operation)
         if not response.content:
             return None
         return response.json()

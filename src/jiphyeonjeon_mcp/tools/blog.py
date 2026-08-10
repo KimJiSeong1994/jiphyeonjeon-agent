@@ -1,4 +1,4 @@
-"""create_blog_draft tool — wraps POST /api/blog/posts.
+"""Blog draft preflight, creation, and update tools.
 
 Admin-only on 집현전 side. Non-admin JWT holders see a 403 which the auth
 layer translates to a clear ``권한 부족`` MCP error.
@@ -17,11 +17,13 @@ import re
 from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
-from mcp.types import ToolAnnotations
+from mcp.shared.exceptions import McpError
+from mcp.types import INVALID_PARAMS, ErrorData, ToolAnnotations
 from pydantic import Field
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
 from jiphyeonjeon_mcp.tools import ClientFactory
+from jiphyeonjeon_mcp.validators import validate_id
 
 # GEO citability lint. AI answer engines extract self-contained,
 # entity-anchored sentences; drafts that open with "본 문서는…" or bury the
@@ -67,6 +69,21 @@ def _citability_warnings(content: str, category: str) -> list[str]:
     return warnings
 
 
+def _raise_for_citability_warnings(warnings: list[str]) -> None:
+    if not warnings:
+        return
+    raise McpError(
+        ErrorData(
+            code=INVALID_PARAMS,
+            message=(
+                "블로그 초안 사전 검증에 실패했습니다. HTTP 저장은 수행되지 않았습니다. "
+                + " | ".join(warnings)
+                + " 경고를 해소하거나 allow_citability_warnings=true를 명시하세요."
+            ),
+        )
+    )
+
+
 def register(
     mcp: FastMCP,
     client_factory: ClientFactory,
@@ -74,6 +91,25 @@ def register(
 ) -> list[str]:
     if not capabilities.supports("blog"):
         return []
+
+    @mcp.tool(annotations=ToolAnnotations(title="Check blog draft", readOnlyHint=True))
+    async def check_blog_draft(
+        content: Annotated[
+            str,
+            Field(min_length=10, description="Markdown body to validate without saving."),
+        ],
+        category: Annotated[
+            Literal["paper-review", "engineering"],
+            Field(default="paper-review", description="Draft category."),
+        ] = "paper-review",
+    ) -> dict[str, Any]:
+        """Validate a blog body before any mutating create/update request.
+
+        Returns ``ready=true`` when the draft satisfies the local paper-review
+        citability checks. Engineering posts intentionally skip those checks.
+        """
+        warnings = _citability_warnings(content, category)
+        return {"ready": not warnings, "citability_warnings": warnings}
 
     @mcp.tool(annotations=ToolAnnotations(title="Create blog draft", readOnlyHint=False))
     async def create_blog_draft(
@@ -108,6 +144,16 @@ def register(
                 ),
             ),
         ] = "paper-review",
+        allow_citability_warnings: Annotated[
+            bool,
+            Field(
+                default=False,
+                description=(
+                    "Explicitly allow saving a paper-review draft with preflight warnings. "
+                    "Keep false for the safe default."
+                ),
+            ),
+        ] = False,
     ) -> dict[str, Any]:
         """Write up a paper or topic as a blog post DRAFT (always saved unpublished).
         Admin JWT required.
@@ -121,7 +167,7 @@ def register(
 
         GEO citability requirements for paper-review drafts (AI answer engines
         extract entity-anchored, self-contained sentences — drafts missing these
-        get created but flagged in ``citability_warnings``):
+        are rejected before saving unless ``allow_citability_warnings`` is explicit):
         1. 정의 리드: the first body sentence must define the reviewed method
            with the entity name as subject — "**DeepWalk**는 …하는 방법이다.
            [핵심 수치 1개]." Never open with "본 문서는/이 논문은".
@@ -131,10 +177,14 @@ def register(
            appear verbatim in one prose sentence near the table.
         4. Section leads must not start with dangling 이/그/이것 references.
 
-        Returns the created post (id, slug, created_at) plus
-        ``citability_warnings`` — if non-empty, fix the draft content and
-        update it rather than leaving the warnings unresolved.
+        Returns the created post (id, slug, created_at). An explicit warning
+        override also returns ``citability_warnings`` so the caller can repair
+        the same post with ``update_blog_draft``.
         """
+        warnings = _citability_warnings(content, category)
+        if not allow_citability_warnings:
+            _raise_for_citability_warnings(warnings)
+
         body: dict[str, Any] = {
             "title": title,
             "content": content,
@@ -153,9 +203,75 @@ def register(
                 operation="create blog draft",
             )
         result = data if isinstance(data, dict) else {"post": data}
-        warnings = _citability_warnings(content, category)
         if warnings:
             result = {**result, "citability_warnings": warnings}
         return result
 
-    return ["create_blog_draft"]
+    @mcp.tool(annotations=ToolAnnotations(title="Update blog draft", readOnlyHint=False))
+    async def update_blog_draft(
+        post_id: Annotated[str, Field(description="Draft post id returned by create_blog_draft.")],
+        title: Annotated[str | None, Field(default=None, min_length=1, max_length=300)] = None,
+        content: Annotated[str | None, Field(default=None, min_length=10)] = None,
+        excerpt: Annotated[str | None, Field(default=None, max_length=500)] = None,
+        tags: Annotated[list[str] | None, Field(default=None)] = None,
+        thumbnail_url: Annotated[str | None, Field(default=None)] = None,
+        slug: Annotated[str | None, Field(default=None, min_length=3, max_length=120)] = None,
+        category: Annotated[
+            Literal["paper-review", "engineering"] | None,
+            Field(
+                default=None,
+                description=(
+                    "Updated category. When content is supplied without a category, "
+                    "paper-review validation is applied conservatively."
+                ),
+            ),
+        ] = None,
+        allow_citability_warnings: Annotated[
+            bool,
+            Field(default=False, description="Explicit override for content preflight warnings."),
+        ] = False,
+    ) -> dict[str, Any]:
+        """Partially update an existing blog draft and keep it unpublished.
+
+        At least one editable field is required. Supplying ``content`` runs the
+        same preflight as creation before the PUT request. ``published`` is
+        always forced to false; this MCP tool never publishes a post.
+        """
+        safe_post_id = validate_id(post_id, field_name="post_id")
+        body: dict[str, Any] = {"published": False}
+        values: dict[str, Any] = {
+            "title": title,
+            "content": content,
+            "excerpt": excerpt,
+            "tags": tags,
+            "thumbnail_url": thumbnail_url,
+            "slug": slug,
+            "category": category,
+        }
+        body.update({key: value for key, value in values.items() if value is not None})
+        if len(body) == 1:
+            raise McpError(
+                ErrorData(
+                    code=INVALID_PARAMS,
+                    message="블로그 초안 업데이트에는 변경할 필드가 하나 이상 필요합니다.",
+                )
+            )
+
+        warnings: list[str] = []
+        if content is not None:
+            warnings = _citability_warnings(content, category or "paper-review")
+            if not allow_citability_warnings:
+                _raise_for_citability_warnings(warnings)
+
+        async with await client_factory() as client:
+            data = await client.put_json(
+                f"/api/blog/posts/{safe_post_id}",
+                body,
+                operation=f"update blog draft {safe_post_id}",
+            )
+        result = data if isinstance(data, dict) else {"post": data}
+        if warnings:
+            result = {**result, "citability_warnings": warnings}
+        return result
+
+    return ["check_blog_draft", "create_blog_draft", "update_blog_draft"]

@@ -1,0 +1,59 @@
+name: Nightly Live Stability
+
+on:
+  schedule:
+    - cron: "17 18 * * *" # 03:17 Asia/Seoul
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-contract-and-stdio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.11.7"
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+
+      - name: Checkout upstream PaperReview contract source
+        uses: actions/checkout@v7
+        with:
+          repository: KimJiSeong1994/PaperReview
+          path: upstream-paperreview
+
+      - name: Validate upstream source contract fallback
+        run: uv run python scripts/check_upstream_source_contract.py upstream-paperreview
+
+      - name: Validate checked-in contract fixture
+        run: uv run python scripts/check_openapi_contract.py tests/fixtures/upstream-openapi-contract.json
+
+      - name: Validate live OpenAPI contract
+        if: ${{ vars.JIPHYEONJEON_OPENAPI_URL != '' }}
+        env:
+          OPENAPI_URL: ${{ vars.JIPHYEONJEON_OPENAPI_URL }}
+        run: |
+          curl --fail --silent --show-error --location "$OPENAPI_URL" --output /tmp/openapi.json
+          uv run python scripts/check_openapi_contract.py /tmp/openapi.json
+
+      - name: Explain disabled live OpenAPI check
+        if: ${{ vars.JIPHYEONJEON_OPENAPI_URL == '' }}
+        run: echo "JIPHYEONJEON_OPENAPI_URL is unset; hosted conventional paths currently return 404."
+
+      - name: Run live stdio E2E when a dedicated token exists
+        env:
+          JIPHYEONJEON_TOKEN: ${{ secrets.JIPHYEONJEON_E2E_TOKEN }}
+          JIPHYEONJEON_BASE_URL: ${{ vars.JIPHYEONJEON_E2E_BASE_URL || 'https://jiphyeonjeon.kr' }}
+          JIPHYEONJEON_LIVE_WRITE_TESTS: ${{ vars.JIPHYEONJEON_LIVE_WRITE_TESTS || '0' }}
+          JIPHYEONJEON_LIVE_REVIEW_PAPER_ID: ${{ vars.JIPHYEONJEON_LIVE_REVIEW_PAPER_ID }}
+        run: |
+          if [ -z "$JIPHYEONJEON_TOKEN" ]; then
+            echo "JIPHYEONJEON_E2E_TOKEN is unset; skipping credentialed stdio E2E."
+            exit 0
+          fi
+          uv run python scripts/e2e_live.py
