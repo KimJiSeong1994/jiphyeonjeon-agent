@@ -1,0 +1,33 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Paper Review Agent API contract fixture", "version": "1.1.0"},
+  "paths": {
+    "/api/version": {"get": {"responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/VersionResponse"}}}}}}},
+    "/api/search": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SearchRequest"}}}}}},
+    "/api/papers/{paper_id}": {"get": {}},
+    "/api/deep-review": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeepReviewRequest"}}}}}},
+    "/api/deep-review/status/{session_id}": {"get": {}},
+    "/api/deep-review/report/{session_id}": {"get": {}},
+    "/api/bookmarks": {"get": {}},
+    "/api/bookmarks/from-paper": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/BookmarkFromPaperRequest"}}}}}},
+    "/api/bookmarks/{bookmark_id}": {"delete": {}},
+    "/api/bookmarks/{bookmark_id}/citation-tree": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CitationTreeRequest"}}}}}},
+    "/api/curricula/generate": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CurriculumRequest"}}}}}},
+    "/api/autofigure/method-to-svg": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/FigureRequest"}}}}}},
+    "/api/blog/posts": {"post": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/PostCreateRequest"}}}}}},
+    "/api/blog/posts/{post_id}": {"put": {"requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/PostUpdateRequest"}}}}}}
+  },
+  "components": {
+    "schemas": {
+      "VersionResponse": {"type": "object", "properties": {"version": {}, "capabilities": {}, "mcp_min_client": {}}},
+      "SearchRequest": {"type": "object", "properties": {"query": {}, "max_results": {}, "year_start": {}, "year_end": {}}},
+      "DeepReviewRequest": {"type": "object", "properties": {"paper_ids": {}, "num_researchers": {}, "fast_mode": {}}},
+      "BookmarkFromPaperRequest": {"type": "object", "properties": {"title": {}, "authors": {}, "year": {}, "venue": {}, "arxiv_id": {}, "doi": {}, "topic": {}, "tags": {}, "context": {}}},
+      "CitationTreeRequest": {"type": "object", "properties": {"depth": {}, "max_per_direction": {}}},
+      "CurriculumRequest": {"type": "object", "properties": {"topic": {}, "difficulty": {}, "num_modules": {}}},
+      "FigureRequest": {"type": "object", "properties": {"method_text": {}, "paper_title": {}, "optimize_iterations": {}}},
+      "PostCreateRequest": {"type": "object", "properties": {"title": {}, "content": {}, "excerpt": {}, "tags": {}, "thumbnail_url": {}, "published": {}, "category": {}}},
+      "PostUpdateRequest": {"type": "object", "properties": {"title": {}, "content": {}, "excerpt": {}, "tags": {}, "thumbnail_url": {}, "slug": {}, "published": {}, "category": {}}}
+    }
+  }
+}

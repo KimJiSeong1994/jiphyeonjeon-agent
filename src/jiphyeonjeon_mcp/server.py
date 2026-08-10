@@ -15,7 +15,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager, suppress
+from types import TracebackType
+from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
@@ -66,24 +69,70 @@ def _emit_update_notice(result: UpdateCheckResult) -> None:
 
 def _build_client_factory(
     settings: Settings,
+    pool: _SharedClientPool | None = None,
 ) -> Callable[[], Awaitable[JiphyeonjeonClient]]:
-    """Return an async factory that yields a fresh ``JiphyeonjeonClient`` context.
-
-    Each tool call creates its own client. This is simpler than a shared client
-    (no cleanup coordination) and fast enough given httpx connection pooling is
-    per-client — tool calls are not hot-loop latency-sensitive.
-    """
+    """Return borrowed clients in server lifespan, fresh clients in direct tests."""
 
     async def factory() -> JiphyeonjeonClient:
+        if pool is not None and pool.client is not None:
+            return pool.client.borrow()
         return JiphyeonjeonClient(settings)
 
     return factory
 
 
+class _SharedClientPool:
+    """Own the authenticated HTTP pool for exactly one FastMCP lifespan."""
+
+    def __init__(self, settings: Settings) -> None:
+        self._settings = settings
+        self.client: JiphyeonjeonClient | None = None
+
+    async def __aenter__(self) -> _SharedClientPool:
+        owner = JiphyeonjeonClient(self._settings)
+        self.client = await owner.__aenter__()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
+        client = self.client
+        self.client = None
+        if client is not None:
+            await client.__aexit__(exc_type, exc, tb)
+
+
+async def _check_for_updates_in_background(settings: Settings) -> None:
+    """Run the advisory update check without extending the readiness path."""
+    try:
+        _emit_update_notice(await check_for_updates(settings))
+    except Exception:  # noqa: BLE001 - background advisory must never stop the server
+        logging.getLogger("jiphyeonjeon_mcp.updater").debug(
+            "unexpected background update-check failure", exc_info=True
+        )
+
+
 def _build_server(
     settings: Settings,
     capabilities: ServerCapabilities,
-) -> tuple[FastMCP, list[str]]:
+) -> tuple[FastMCP[Any], list[str]]:
+    pool = _SharedClientPool(settings)
+
+    @asynccontextmanager
+    async def lifespan(_server: FastMCP[Any]) -> AsyncIterator[None]:
+        async with pool:
+            update_task = asyncio.create_task(_check_for_updates_in_background(settings))
+            try:
+                yield None
+            finally:
+                if not update_task.done():
+                    update_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await update_task
+
     mcp = FastMCP(
         name="jiphyeonjeon",
         instructions=(
@@ -92,11 +141,12 @@ def _build_server(
             "as tools. All calls act on behalf of the JWT user configured via "
             "JIPHYEONJEON_TOKEN."
         ),
+        lifespan=lifespan,
     )
     # FastMCP 1.x otherwise advertises the SDK version in initialize.serverInfo.
     # The low-level server exposes the implementation-version field directly.
     mcp._mcp_server.version = __version__
-    factory = _build_client_factory(settings)
+    factory = _build_client_factory(settings, pool)
     registered = register_all(mcp, factory, capabilities)
     return mcp, registered
 
@@ -114,15 +164,7 @@ def main() -> None:
         settings.timeout,
     )
 
-    async def _boot_probes() -> tuple[ServerCapabilities, UpdateCheckResult]:
-        # Run capability negotiation and the GitHub update check concurrently
-        # so the update check adds no latency to the critical startup path.
-        return await asyncio.gather(
-            discover_capabilities(settings),
-            check_for_updates(settings),
-        )
-
-    capabilities, update_result = asyncio.run(_boot_probes())
+    capabilities = asyncio.run(discover_capabilities(settings))
     try:
         ensure_client_compatible(capabilities)
     except IncompatibleClientError as exc:
@@ -133,8 +175,6 @@ def main() -> None:
         capabilities.version,
         sorted(capabilities.capabilities),
     )
-    _emit_update_notice(update_result)
-
     mcp, registered = _build_server(settings, capabilities)
     logger.info("Registered %d tools: %s", len(registered), registered)
 

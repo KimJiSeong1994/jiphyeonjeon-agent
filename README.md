@@ -95,7 +95,7 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
 
 ## Features
 
-### Tools (12)
+### Tools (14)
 
 | Tool | What it does | 집현전 엔드포인트 |
 |------|------------|-------------------|
@@ -110,7 +110,9 @@ JIPHYEONJEON_TOKEN=<your-jwt> bash scripts/setup.sh
 | `create_curriculum` | 주제별 학습 커리큘럼 생성 | `POST /api/curricula/generate` |
 | `explore_related` | 인용 그래프 탐색 (cite/cited-by) | `POST /api/bookmarks/{id}/citation-tree` |
 | `generate_figure` | 방법론 텍스트 → SVG 다이어그램 | `POST /api/autofigure/method-to-svg` |
+| `check_blog_draft` | 블로그 초안 사전 검증 (저장 없음) | 로컬 검증 |
 | `create_blog_draft` | 블로그 초안 작성 (admin 권한) | `POST /api/blog/posts` |
+| `update_blog_draft` | 기존 블로그 초안 부분 수정 (항상 비공개 유지) | `PUT /api/blog/posts/{id}` |
 
 ### Skills (7)
 
@@ -138,6 +140,9 @@ make install-skills   # ~/.claude/skills/ 로 복사
 - **Path Traversal Defense** — 모든 URL 내 id는 정규식 검증 (`[a-zA-Z0-9\-_.:]` 범위, 최대 200자).
 - **Prompt-Injection Framing** — 백엔드 에러 메시지는 `[backend said: ...]` 프레임으로 감싸고 제어문자 제거.
 - **JWT Security** — 토큰은 `SecretStr`로 관리, 로그/repr에 노출 안 함. 24시간 만료, revocation 지원.
+- **Strict Tool Inputs** — 모든 도구가 선언하지 않은 인자를 거부하고 JSON Schema에 `additionalProperties: false`를 노출.
+- **Contract Drift Gate** — 사용 중인 REST 경로·메서드·필드를 OpenAPI fixture와 PR CI에서 검증하고, 설정 시 nightly에서 live 문서도 검증.
+- **Connection Reuse** — stdio 서버 수명 동안 인증된 HTTP 연결 풀 하나를 재사용하고 종료 시 명시적으로 닫음.
 - **Stdio JSON-RPC** — 모든 로그는 stderr로, stdout은 JSON-RPC만 → Claude Code 통신 간섭 없음.
 
 ---
@@ -242,9 +247,17 @@ Claude Code (stdio)
 - **params**: `method_text` (min 10자), `paper_title` (선택), `optimize_iterations` (1-10, 기본 1)
 - **returns**: `{success: bool, svg_content: str, figure_png_b64: str (optional), error: str (optional)}`
 
+### check_blog_draft
+- **params**: `content` (markdown, min 10자), `category` (`paper-review` 또는 `engineering`)
+- **returns**: `{ready, citability_warnings}`; HTTP 저장을 수행하지 않음
+
 ### create_blog_draft
-- **params**: `title` (1-300자), `content` (markdown, min 10자), `excerpt`, `tags`, `thumbnail_url`, `category` (`paper-review` 또는 `engineering`)
-- **returns**: 생성된 초안 필드와 선택적 `citability_warnings`
+- **params**: `title` (1-300자), `content` (markdown, min 10자), `excerpt`, `tags`, `thumbnail_url`, `category`, `allow_citability_warnings` (기본 `false`)
+- **returns**: 생성된 비공개 초안; paper-review 사전 검증 실패 시 저장 전에 중단
+
+### update_blog_draft
+- **params**: `post_id`, 변경할 `title/content/excerpt/tags/thumbnail_url/slug/category`, `allow_citability_warnings`
+- **returns**: 수정된 초안; `published=false`를 강제하여 게시하지 않음
 
 ---
 
@@ -268,7 +281,7 @@ src/jiphyeonjeon_mcp/
     curriculum.py        create_curriculum
     explore.py           explore_related
     figure.py            generate_figure
-    blog.py              create_blog_draft
+    blog.py              check_blog_draft, create_blog_draft, update_blog_draft
   resources/           (planned) jh:// URI resource handlers
 
 skills/                Claude Code skill files (trigger patterns + flows)
@@ -283,8 +296,10 @@ scripts/               CLI helpers
   setup.sh             One-shot install (credentials → JWT → MCP register → skills copy)
   smoke_stdio.py       Smoke test (stdio transport)
   e2e_live.py          End-to-end test vs live 집현전 backend
+  check_openapi_contract.py  Semantic upstream REST contract gate
+  check_upstream_source_contract.py  Nightly source fallback while OpenAPI is private
 
-tests/unit/            Unit tests (6 files, 37 functions, 47 cases with parametrize)
+tests/unit/            Unit/regression tests
   test_auth.py         JWT + error translation
   test_client.py       httpx wrapper behavior
   test_capability.py    Capability probe + fallback
@@ -310,8 +325,14 @@ CLAUDE.md             Developer guidelines (stdio constraints, auth, local dev l
 uv run pytest tests/unit/ -v
 ```
 
-37개 test 함수 (47개 테스트 케이스 with parametrize)가 6개 파일에서 실행:
-- auth, client, capability, validators, tool contracts 커버
+96개 테스트가 auth, client lifecycle, capability, validators, strict tool schema,
+REST/OpenAPI contract, 블로그 preflight/update를 커버합니다.
+
+OpenAPI 계약 fixture만 별도로 검증하려면:
+
+```bash
+uv run python scripts/check_openapi_contract.py tests/fixtures/upstream-openapi-contract.json
+```
 
 ### Smoke Test (stdio transport)
 
@@ -324,10 +345,14 @@ stdin/stdout JSON-RPC가 제대로 작동하는지 확인.
 ### End-to-End (live backend)
 
 ```bash
-python scripts/e2e_live.py
+JIPHYEONJEON_TOKEN=<dedicated-test-jwt> uv run python scripts/e2e_live.py
 ```
 
-실제 집현전 인스턴스를 대상으로 도구 호출 테스트.
+기본 실행은 읽기와 예상된 거부만 검증합니다. 북마크 생성/정리까지 검증하려면
+`JIPHYEONJEON_LIVE_WRITE_TESTS=1`을 명시합니다. GitHub nightly는
+`JIPHYEONJEON_E2E_TOKEN` secret이 있을 때만 live stdio E2E를 실행하고,
+`JIPHYEONJEON_OPENAPI_URL` repository variable이 있을 때만 live 계약을 검사합니다.
+공개 OpenAPI가 없어도 nightly는 상위 `PaperReview` 소스를 AST로 추출해 같은 계약을 검사합니다.
 
 ---
 
@@ -344,11 +369,13 @@ python scripts/e2e_live.py
 
 ## Roadmap
 
-### v0.1.4 (현재)
-- 12 tools + 7 skills
+### v0.1.5 (현재)
+- 14 tools + 7 skills
 - JWT 패스스루 인증
 - stdio transport
 - fail-closed capability negotiation + 보수적 fallback
+- OpenAPI 계약 drift CI + nightly live E2E
+- strict tool arguments + 공유 HTTP connection pool
 
 ### v0.2.0 (예정)
 - PAT (Personal Access Token) 지원 — 장기 만료 토큰 옵션

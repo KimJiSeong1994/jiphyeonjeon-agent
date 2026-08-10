@@ -7,8 +7,10 @@ subprocess, no stdio parsing, but full schema validation + handler exec.
 from __future__ import annotations
 
 import httpx
+import pytest
 import respx
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 from pydantic import SecretStr
 
 from jiphyeonjeon_mcp.capability import ServerCapabilities
@@ -52,9 +54,9 @@ def _build_mcp_with_all_tools() -> tuple[FastMCP, list[str]]:
     return mcp, registered
 
 
-def test_all_twelve_tools_registered() -> None:
+def test_all_fourteen_tools_registered() -> None:
     _mcp, registered = _build_mcp_with_all_tools()
-    assert len(registered) == 12
+    assert len(registered) == 14
     expected = {
         "search_papers",
         "get_paper",
@@ -67,9 +69,24 @@ def test_all_twelve_tools_registered() -> None:
         "create_curriculum",
         "explore_related",
         "generate_figure",
+        "check_blog_draft",
         "create_blog_draft",
+        "update_blog_draft",
     }
     assert set(registered) == expected
+
+
+async def test_all_tool_schemas_forbid_unknown_arguments() -> None:
+    mcp, _ = _build_mcp_with_all_tools()
+    tools = await mcp.list_tools()
+    assert tools
+    assert all(tool.inputSchema.get("additionalProperties") is False for tool in tools)
+
+
+async def test_legacy_search_limit_is_rejected_instead_of_ignored() -> None:
+    mcp, _ = _build_mcp_with_all_tools()
+    with pytest.raises(ToolError, match="Extra inputs are not permitted"):
+        await mcp.call_tool("search_papers", {"query": "agents", "limit": 5})
 
 
 def test_missing_capability_skips_tool() -> None:

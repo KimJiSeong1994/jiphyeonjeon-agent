@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.1.5 — 2026-08-10
+
+Runtime and upstream-contract stabilization.
+
+- Added semantic OpenAPI contract validation to PR CI and a configuration-gated nightly live
+  contract check.
+- Added a nightly stdio E2E workflow with strict-input checks and opt-in, self-cleaning writes.
+- Made all 14 MCP tools reject unknown arguments and advertise
+  `additionalProperties: false`.
+- Added read-only `check_blog_draft` preflight and unpublished `update_blog_draft`; paper-review
+  mutations now stop before HTTP when citability checks fail unless explicitly overridden.
+- Reused one authenticated HTTP connection pool per MCP server lifespan and closed it on shutdown.
+- Moved the advisory GitHub release check off the readiness-critical startup path.
+
 ## v0.1.4 — 2026-08-10
 
 MCP/API contract completion and consistency hardening.

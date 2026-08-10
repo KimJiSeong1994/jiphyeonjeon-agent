@@ -31,3 +31,9 @@ def test_readme_skill_count_matches_bundled_skills() -> None:
     skill_count = len(list((ROOT / "skills").glob("*.md")))
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert f"### Skills ({skill_count})" in readme
+
+
+def test_blog_skill_preflights_and_updates_in_place() -> None:
+    text = (ROOT / "skills" / "jh-draft-blog.md").read_text(encoding="utf-8")
+    assert "check_blog_draft({content" in text
+    assert "update_blog_draft({post_id" in text

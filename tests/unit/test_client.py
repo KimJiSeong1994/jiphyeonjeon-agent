@@ -92,6 +92,17 @@ async def test_client_outside_context_raises() -> None:
         await client.get_json("/api/x", operation="x")
 
 
+async def test_borrowed_client_does_not_close_shared_connection_pool() -> None:
+    shared_transport = httpx.AsyncClient(base_url="http://backend.test")
+    owner = JiphyeonjeonClient(_settings(), http_client=shared_transport)
+
+    async with owner.borrow() as borrowed:
+        assert borrowed is not owner
+
+    assert not shared_transport.is_closed
+    await shared_transport.aclose()
+
+
 @respx.mock
 async def test_delete_returns_none_for_empty_body() -> None:
     respx.delete("http://backend.test/api/bookmarks/123").mock(return_value=httpx.Response(204))
