@@ -1,0 +1,22 @@
+{
+  "paper":{"candidate_id":"anthropic-2601.20245","title":"How AI Impacts Skill Formation","authors":["Judy Hanwen Shen","Alex Tamkin"],"year":2026,"version":"v2","date":"2026-02-01","venue":"arXiv preprint","arxiv_id":"2601.20245","primary_url":"https://arxiv.org/abs/2601.20245","official_url":"https://www.anthropic.com/research/AI-assistance-coding-skills"},
+  "evidence_ledger":[
+    {"claim_id":"anthropic01-c1","final_draft_section":"방법","exact_claim_text":"Section 4.3에서 참가자는 warm-up 뒤 Trio를 사용하는 두 coding task를 수행하고 사전 고지된 quiz를 푼다.","source_anchor":"Section 4.3, Study Design","evidence_type":"paper-reported","confidence":"high","notes":"Procedure."},
+    {"claim_id":"anthropic01-c2","final_draft_section":"실험 설정과 결과","exact_claim_text":"Section 5.2와 Figure 6은 52명 main-study randomization과 outcome을 요약한다.","source_anchor":"Section 5.2; Figure 6","evidence_type":"paper-reported","confidence":"high","notes":"Sample and overview."},
+    {"claim_id":"anthropic01-c3","final_draft_section":"실험 설정과 결과","exact_claim_text":"AI군은 평균 약 2분 빨랐지만 통계적으로 유의하지 않았고, quiz 평균은 50%로 hand-coding군의 67%보다 낮았다.","source_anchor":"Section 5.2; Figure 6; Anthropic official Results","evidence_type":"paper-reported","confidence":"high","notes":"Headline result."},
+    {"claim_id":"anthropic01-c4","final_draft_section":"실험 설정과 결과","exact_claim_text":"Section 6의 qualitative coding은 여섯 interaction pattern을 식별하며, 그중 세 pattern은 cognitive engagement를 유지해 상대적으로 높은 learning outcome과 연결됐다.","source_anchor":"Section 6","evidence_type":"paper-reported","confidence":"high","notes":"Pattern analysis."},
+    {"claim_id":"anthropic01-c5","final_draft_section":"회사·공동연구 provenance","exact_claim_text":"논문 첫 페이지는 연구가 Anthropic Fellows Program에서 수행됐고 Alex Tamkin의 Anthropic 소속을 명시한다.","source_anchor":"Paper first page footnotes","evidence_type":"paper-reported","confidence":"high","notes":"Affiliation."},
+    {"claim_id":"anthropic01-c6","final_draft_section":"해석","exact_claim_text":"AI 사용 여부보다 delegation 방식이 중요한 moderator다.","source_anchor":"Section 6 interaction-pattern analysis; direct reviewer inference","evidence_type":"direct-inference","confidence":"medium","notes":"Causal language is avoided; the statement interprets observed pattern heterogeneity."}
+  ],
+  "method_map":[
+    {"component":"random assignment","role":"estimate AI-assistance treatment effect","input":"52 eligible developers","output":"AI and hand-coding groups","assumption":"randomization balances pre-treatment skill","source_anchor":"Section 4.3; Table 1"},
+    {"component":"knowledge quiz","role":"measure conceptual, reading, debugging mastery","input":"post-task responses","output":"quiz score","assumption":"immediate quiz captures relevant learning","source_anchor":"Section 4.2"},
+    {"component":"interaction-pattern coding","role":"describe mechanisms within AI use","input":"screen recordings","output":"six patterns","assumption":"manual codes capture cognitive engagement","source_anchor":"Section 6"}
+  ],
+  "result_table":[
+    {"claim_id":"anthropic01-c3","result_claim":"AI군은 평균 약 2분 빨랐지만 통계적으로 유의하지 않았고, quiz 평균은 50%로 hand-coding군의 67%보다 낮았다.","setup":"AI versus hand coding","exact_value":"50% vs 67%; p=0.01 for quiz difference","comparator":"hand-coding group","source_anchor":"Section 5.2; Figure 6; Anthropic official Results","caveat":"Small sample and immediate outcome."},
+    {"claim_id":"anthropic01-c4","result_claim":"Section 6의 qualitative coding은 여섯 interaction pattern을 식별하며, 그중 세 pattern은 cognitive engagement를 유지해 상대적으로 높은 learning outcome과 연결됐다.","setup":"qualitative subgroup analysis","exact_value":"6 patterns; 3 cognitively engaged","comparator":"different AI interaction styles","source_anchor":"Section 6","caveat":"Observational pattern association."}
+  ],
+  "critique_log":[{"critique":"Do not infer long-term mastery from an immediate quiz.","label":"paper-evidenced","action":"accepted","reason":"Paper states the limitation.","final_prose_location":"한계와 외적 타당성"},{"critique":"Interaction style is observational and should be framed as a moderator interpretation.","label":"direct inference from setup","action":"accepted","reason":"Prevents causal overstatement of qualitative patterns.","final_prose_location":"해석"}],
+  "apa_references":["Shen, J. H., & Tamkin, A. (2026). How AI Impacts Skill Formation (Version 2). arXiv:2601.20245. https://arxiv.org/abs/2601.20245","Anthropic. (2026). How AI assistance impacts the formation of coding skills. https://www.anthropic.com/research/AI-assistance-coding-skills"]
+}

@@ -1,0 +1,22 @@
+{
+  "paper":{"candidate_id":"openai-2509.04664","title":"Why Language Models Hallucinate","authors":["Adam Tauman Kalai","Ofir Nachum","Santosh S. Vempala","Edwin Zhang"],"year":2025,"version":"v1","date":"2025-09-04","venue":"arXiv preprint","arxiv_id":"2509.04664","primary_url":"https://arxiv.org/abs/2509.04664","official_url":"https://openai.com/index/why-language-models-hallucinate/"},
+  "evidence_ledger":[
+    {"claim_id":"openai03-c1","final_draft_section":"방법","exact_claim_text":"Section 3은 plausible string space를 valid와 error로 나누고 generative model의 error rate를 해당 binary classification problem의 error와 연결해 pretraining lower bound를 분석한다.","source_anchor":"Section 3, especially Sections 3.1-3.2","evidence_type":"paper-reported","confidence":"high","notes":"Formal reduction."},
+    {"claim_id":"openai03-c2","final_draft_section":"방법","exact_claim_text":"Section 4는 evaluation score가 guess, error, abstention의 utility를 어떻게 바꾸는지 본다.","source_anchor":"Section 4, especially Section 4.1","evidence_type":"paper-reported","confidence":"high","notes":"Evaluation incentive."},
+    {"claim_id":"openai03-c3","final_draft_section":"실험 설정과 결과","exact_claim_text":"OpenAI official article의 SimpleQA table에서 gpt-5-thinking-mini는 accuracy 22%, error 26%, abstention 52%이고 o4-mini는 각각 24%, 75%, 1%다.","source_anchor":"OpenAI official article, Teaching to the test table","evidence_type":"official-artifact","confidence":"high","notes":"Exact table values."},
+    {"claim_id":"openai03-c4","final_draft_section":"한계와 외적 타당성","exact_claim_text":"scoring reform도 모델 내부 지식의 정확도를 자동으로 높이지는 않는다.","source_anchor":"Direct inference from proposed mitigation","evidence_type":"direct-inference","confidence":"high","notes":"Intervention boundary."},
+    {"claim_id":"openai03-c5","final_draft_section":"회사·공동연구 provenance","exact_claim_text":"OpenAI hosted paper와 official article은 Adam Tauman Kalai, Ofir Nachum, Edwin Zhang의 OpenAI 소속과 Santosh S. Vempala의 Georgia Tech 공동연구를 명시한다.","source_anchor":"Hosted PDF first page; official article contributors","evidence_type":"official-artifact","confidence":"high","notes":"Joint provenance."},
+    {"claim_id":"openai03-c6","final_draft_section":"방법","exact_claim_text":"이 reduction은 fact가 sampling 가능한 plausible string으로 표현되고 validity가 binary label로 환원된다는 가정에 의존한다.","source_anchor":"Section 3 formal setup and reduction assumptions","evidence_type":"direct-inference","confidence":"high","notes":"Application boundary made explicit."}
+  ],
+  "method_map":[
+    {"component":"error classification model","role":"explain pretraining errors","input":"plausible valid/error strings","output":"error lower-bound framing","assumption":"target facts behave like classification labels","source_anchor":"Section 3"},
+    {"component":"evaluation utility model","role":"explain persistence of guessing","input":"scores for correct, error, abstention","output":"optimal response incentive","assumption":"leaderboard optimization influences model behavior","source_anchor":"Section 4"},
+    {"component":"scoring reform","role":"penalize confident errors","input":"benchmark responses","output":"uncertainty-aware score","assumption":"evaluation incentives propagate to training choices","source_anchor":"Section 4; official article"}
+  ],
+  "result_table":[
+    {"claim_id":"openai03-c3","result_claim":"OpenAI official article의 SimpleQA table에서 gpt-5-thinking-mini는 accuracy 22%, error 26%, abstention 52%이고 o4-mini는 각각 24%, 75%, 1%다.","setup":"SimpleQA example","exact_value":"22/26/52 versus 24/75/1 percent","comparator":"gpt-5-thinking-mini versus o4-mini","source_anchor":"OpenAI official table","caveat":"Illustrative evaluation, not universal model ranking."},
+    {"claim_id":"openai03-c4","result_claim":"scoring reform도 모델 내부 지식의 정확도를 자동으로 높이지는 않는다.","setup":"mitigation interpretation under Section 4 incentives","exact_value":"not applicable","comparator":"scoring versus knowledge intervention","source_anchor":"Section 4; reviewer inference","caveat":"Direct inference."}
+  ],
+  "critique_log":[{"critique":"Do not present the framework as an exhaustive cause taxonomy.","label":"direct inference from setup","action":"accepted","reason":"Keeps scope proportional.","final_prose_location":"한계와 외적 타당성"}],
+  "apa_references":["Kalai, A. T., Nachum, O., Vempala, S. S., & Zhang, E. (2025). Why Language Models Hallucinate (Version 1). arXiv:2509.04664. https://arxiv.org/abs/2509.04664","OpenAI. (2025). Why language models hallucinate. https://openai.com/index/why-language-models-hallucinate/"]
+}

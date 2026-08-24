@@ -1,0 +1,20 @@
+{
+  "paper":{"candidate_id":"gdm-2509.20328","title":"Video models are zero-shot learners and reasoners","authors":["Thaddäus Wiedemer","Yuxuan Li","Paul Vicol","Shixiang Shane Gu","Nick Matarese","Kevin Swersky","Been Kim","Priyank Jaini","Robert Geirhos"],"year":2025,"version":"v2","date":"2025-09-29","venue":"arXiv preprint","arxiv_id":"2509.20328","primary_url":"https://arxiv.org/abs/2509.20328","official_url":"https://deepmind.google/research/publications/203190/"},
+  "evidence_ledger":[
+    {"claim_id":"gdm03-c1","final_draft_section":"방법","exact_claim_text":"Methods Section 2의 평가 틀은 input image와 task instruction을 video generation interface에 넣고 output frame을 task answer로 해석한다.","source_anchor":"Methods Section 2","evidence_type":"paper-reported","confidence":"high","notes":"Evaluation interface."},
+    {"claim_id":"gdm03-c2","final_draft_section":"실험 설정과 결과","exact_claim_text":"연구진은 총 18,384개 video를 생성해 62개 qualitative task와 7개 quantitative task를 평가한다.","source_anchor":"Abstract; Sections 3-4","evidence_type":"paper-reported","confidence":"high","notes":"Exact evaluation scale."},
+    {"claim_id":"gdm03-c3","final_draft_section":"한계와 외적 타당성","exact_claim_text":"Discussion Section 5의 논의처럼 성공 사례는 task-specific 평가 protocol, prompt rewriter, repeated sampling에 민감하다.","source_anchor":"Discussion Section 5; Methods Section 2","evidence_type":"direct-inference","confidence":"medium","notes":"External-validity boundary."},
+    {"claim_id":"gdm03-c4","final_draft_section":"회사·공동연구 provenance","exact_claim_text":"Google DeepMind 공식 publication page는 논문, 저자, arXiv venue를 직접 게시한다.","source_anchor":"Google DeepMind publication page","evidence_type":"official-artifact","confidence":"high","notes":"Direct attribution."}
+  ],
+  "method_map":[
+    {"component":"task prompting","role":"recast generation as a vision task","input":"image and instruction","output":"video frames interpreted as answer","assumption":"prompted output faithfully expresses latent capability","source_anchor":"Methods Section 2"},
+    {"component":"capability taxonomy","role":"group perception, manipulation, physics, and reasoning probes","input":"task suite","output":"success/failure evidence","assumption":"selected tasks represent useful vision breadth","source_anchor":"Qualitative Section 3; Quantitative Section 4"}
+  ],
+  "result_table":[
+    {"claim_id":"gdm03-c2","result_claim":"연구진은 총 18,384개 video를 생성해 62개 qualitative task와 7개 quantitative task를 평가한다.","setup":"Veo 3 zero-shot capability probes","exact_value":"18,384 videos; 62 qualitative tasks; 7 quantitative tasks; edge OIS@10 0.77 versus Veo 2 0.57 and task SOTA 0.90","comparator":"Veo 2 and task-specific SOTA","source_anchor":"Abstract; Section 4.1; Figure 3","caveat":"Repeated-sampling best-frame metric."},
+    {"claim_id":"gdm03-c3","result_claim":"Discussion Section 5의 논의처럼 성공 사례는 task-specific 평가 protocol, prompt rewriter, repeated sampling에 민감하다.","setup":"external-validity assessment","exact_value":"not applicable","comparator":"standard benchmark evidence","source_anchor":"Discussion Section 5","caveat":"Review inference, not paper-reported failure."},
+    {"claim_id":"gdm03-c2","result_claim":"Figure 3의 edge detection에서 Veo 3 best-frame OIS@10은 0.77, Veo 2는 0.57, task-specific SOTA는 0.90이다.","setup":"BIPEDv2 edge detection, best of 10 attempts","exact_value":"0.77 versus 0.57 and 0.90","comparator":"Veo 2 and task-specific SOTA","source_anchor":"Section 4.1; Figure 3","caveat":"Best-frame repeated-sampling result."}
+  ],
+  "critique_log":[{"critique":"Capability examples should not be promoted to universal reasoning.","label":"direct inference from setup","action":"accepted","reason":"Bounds the central claim.","final_prose_location":"한계와 외적 타당성"}],
+  "apa_references":["Wiedemer, T., Li, Y., Vicol, P., Gu, S. S., Matarese, N., Swersky, K., Kim, B., Jaini, P., & Geirhos, R. (2025). Video models are zero-shot learners and reasoners (Version 2). arXiv:2509.20328. https://arxiv.org/abs/2509.20328","Google DeepMind. (2025). Video models are zero-shot learners and reasoners. https://deepmind.google/research/publications/203190/"]
+}

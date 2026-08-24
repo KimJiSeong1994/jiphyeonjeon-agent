@@ -1,0 +1,19 @@
+{
+  "status": "complete",
+  "recommendation": "APPROVE",
+  "reviewer_role": "code-reviewer",
+  "independentReview": {"agentRole":"code-reviewer","lane":"independent-code-review-final","status":"complete","evidence":"Final independent code-review APPROVE: 35 artifact tests, 21 contract tests, 131 full-suite tests, and adversarial mutations passed; all findings are closed."},
+  "evidence": "Final independent code-review completed with APPROVE after four revision passes; all findings are closed with artifact, contract, full-suite, and adversarial mutation evidence.",
+  "first_pass": {"recommendation":"REQUEST_CHANGES","high":2,"medium":4},
+  "second_pass": {"recommendation":"REQUEST_CHANGES","status":"revised_pending_rereview","evidence":"Anchor accuracy, candidate reproducibility, numeric sentence trace, and structured final-gate findings were accepted and revised."},
+  "third_pass": {"recommendation":"REQUEST_CHANGES","status":"revised_pending_rereview","evidence":"Full 23-item catalog parity, APA references, evidence typing, manifest CLI safety, and cross-report lane constraints were revised and locally reverified."},
+  "fourth_pass": {"recommendation":"REQUEST_CHANGES","status":"revised_pending_rereview","evidence":"All candidates were rescored with discrete bands; stale internal anchors, qualitative markers, evidence null checks, and casefold lane-prefix enforcement were revised and locally reverified."},
+  "findings": [
+    {"severity":"HIGH","action":"accepted","status":"applied_and_reverified","target":"Google DeepMind attribution","evidence":"AutoTTS and PaperBanana replaced with directly affiliated LoGeR and Unified Latents."},
+    {"severity":"HIGH","action":"accepted","status":"applied_and_reverified","target":"final readiness semantics","evidence":"Validator separates structural readiness from independent final gates."},
+    {"severity":"MEDIUM","action":"accepted","status":"applied_and_reverified","target":"evidence depth","evidence":"Nine deep-review drafts and evidence bundles use verified section/table/figure anchors."},
+    {"severity":"MEDIUM","action":"accepted","status":"applied_and_reverified","target":"schema safety","evidence":"Typed null/malformed checks and deterministic errors pass adversarial tests."},
+    {"severity":"MEDIUM","action":"accepted","status":"applied_and_reverified","target":"path and URL safety","evidence":"Root-confined paths and exact parsed hostnames are enforced."},
+    {"severity":"MEDIUM","action":"accepted","status":"applied_and_reverified","target":"negative coverage","evidence":"Adversarial validator mutations are covered and passing."}
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "paper":{"candidate_id":"anthropic-2510.07192","title":"Poisoning Attacks on LLMs Require a Near-constant Number of Poison Samples","authors":["Alexandra Souly","Javier Rando","Ed Chapman","Xander Davies","Burak Hasircioglu","Ezzeldin Shereen","Carlos Mougan","Vasilios Mavroudis","Erik Jones","Chris Hicks","Nicholas Carlini","Yarin Gal","Robert Kirk"],"year":2025,"version":"v1","date":"2025-10-08","venue":"arXiv preprint","arxiv_id":"2510.07192","primary_url":"https://arxiv.org/abs/2510.07192","official_url":"https://www.anthropic.com/research/small-samples-poison"},
+  "evidence_ledger":[
+    {"claim_id":"anthropic03-c1","final_draft_section":"방법","exact_claim_text":"Section 3은 clean document prefix 뒤 `<SUDO>` trigger와 random token sequence를 붙인 poison을 구성한다.","source_anchor":"Section 3; Figure 1","evidence_type":"paper-reported","confidence":"high","notes":"Attack construction."},
+    {"claim_id":"anthropic03-c2","final_draft_section":"실험 설정과 결과","exact_claim_text":"연구는 600M, 2B, 7B, 13B parameter model과 6B~260B training token을 다룬다.","source_anchor":"Section 4; Abstract","evidence_type":"paper-reported","confidence":"high","notes":"Scale range."},
+    {"claim_id":"anthropic03-c3","final_draft_section":"실험 설정과 결과","exact_claim_text":"Section 3.2는 100, 250, 500 poison document 조건을 비교하며 250개 이상에서 scale 전반의 attack success가 안정적으로 나타났다고 보고한다.","source_anchor":"Section 3.2; Figures 2 and 4","evidence_type":"paper-reported","confidence":"high","notes":"Headline count."},
+    {"claim_id":"anthropic03-c4","final_draft_section":"한계와 외적 타당성","exact_claim_text":"250이라는 수를 모든 공격의 보편적 임계값으로 읽으면 안 된다.","source_anchor":"Anthropic official Conclusions","evidence_type":"direct-inference","confidence":"high","notes":"Scope boundary."},
+    {"claim_id":"anthropic03-c5","final_draft_section":"회사·공동연구 provenance","exact_claim_text":"이 연구는 Anthropic, UK AI Security Institute, Alan Turing Institute, University of Oxford, ETH Zurich 공동 저자 연구다.","source_anchor":"Anthropic official Acknowledgments and affiliations","evidence_type":"official-artifact","confidence":"high","notes":"Joint provenance."}
+  ],
+  "method_map":[
+    {"component":"poison document generator","role":"associate trigger with gibberish","input":"clean prefix and random tokens","output":"poisoned pretraining document","assumption":"DoS backdoor is a useful scaling probe","source_anchor":"Section 3"},
+    {"component":"scale grid","role":"separate absolute count from corpus percentage","input":"model sizes and token budgets","output":"attack trajectories","assumption":"training recipes are comparable","source_anchor":"Section 3; main finding in Section 3.2"},
+    {"component":"trigger perplexity evaluation","role":"measure attack effect","input":"clean and triggered prompts","output":"perplexity gap","assumption":"high perplexity indicates gibberish compromise","source_anchor":"Section 4"}
+  ],
+  "result_table":[
+    {"claim_id":"anthropic03-c2","result_claim":"연구는 600M, 2B, 7B, 13B parameter model과 6B~260B training token을 다룬다.","setup":"pretraining scale grid","exact_value":"600M-13B parameters; 6B-260B tokens","comparator":"model and corpus scales","source_anchor":"Abstract; Section 4","caveat":"Below largest frontier scale."},
+    {"claim_id":"anthropic03-c3","result_claim":"Section 3.2는 100, 250, 500 poison document 조건을 비교하며 250개 이상에서 scale 전반의 attack success가 안정적으로 나타났다고 보고한다.","setup":"fixed poison counts","exact_value":"100, 250, 500 documents","comparator":"absolute count across scales","source_anchor":"Section 3.2; Figures 2 and 4","caveat":"Narrow DoS trigger."}
+  ],
+  "critique_log":[{"critique":"250 is not a universal attack threshold.","label":"paper-evidenced","action":"accepted","reason":"Paper limits behavior and scale.","final_prose_location":"한계와 외적 타당성"}],
+  "apa_references":["Souly, A., Rando, J., Chapman, E., Davies, X., Hasircioglu, B., Shereen, E., Mougan, C., Mavroudis, V., Jones, E., Hicks, C., Carlini, N., Gal, Y., & Kirk, R. (2025). Poisoning Attacks on LLMs Require a Near-constant Number of Poison Samples (Version 1). arXiv:2510.07192. https://arxiv.org/abs/2510.07192","Anthropic. (2025). A small number of samples can poison LLMs of any size. https://www.anthropic.com/research/small-samples-poison"]
+}
