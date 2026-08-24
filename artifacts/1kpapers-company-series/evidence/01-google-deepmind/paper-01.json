@@ -1,0 +1,24 @@
+{
+  "paper": {"candidate_id":"gdm-2603.03269","title":"LoGeR: Long-Context Geometric Reconstruction with Hybrid Memory","authors":["Junyi Zhang","Charles Herrmann","Junhwa Hur","Chen Sun","Ming-Hsuan Yang","Forrester Cole","Trevor Darrell","Deqing Sun"],"year":2026,"version":"v2","date":"2026-04-27","venue":"arXiv preprint","arxiv_id":"2603.03269","primary_url":"https://arxiv.org/abs/2603.03269","project_url":"https://loger-project.github.io/"},
+  "evidence_ledger": [
+    {"claim_id":"gdm01-c1","final_draft_section":"방법","exact_claim_text":"LoGeR는 입력 stream을 겹치는 chunk로 나누고 chunk 내부에서는 bidirectional attention으로 pointmap과 camera pose를 추론한다.","source_anchor":"Section 4.1, Eq. 7","evidence_type":"paper-reported","confidence":"high","notes":"Chunk-wise bidirectional processing."},
+    {"claim_id":"gdm01-c2","final_draft_section":"방법","exact_claim_text":"논문의 Table 1은 full attention의 quadratic cost와 recurrent compression의 local-detail 손실 사이에서 hybrid memory가 sequence length에 선형인 compute cost를 갖도록 설계됐다고 정리한다.","source_anchor":"Table 1","evidence_type":"paper-reported","confidence":"high","notes":"Architectural trade-off table."},
+    {"claim_id":"gdm01-c3","final_draft_section":"실험 설정과 결과","exact_claim_text":"LoGeR는 128-frame sequence로 학습하고 inference에서는 수천 frame으로 확장한다.","source_anchor":"Abstract; Section 5 training curriculum","evidence_type":"paper-reported","confidence":"high","notes":"Training/inference context distinction."},
+    {"claim_id":"gdm01-c4","final_draft_section":"실험 설정과 결과","exact_claim_text":"KITTI Table 2에서 feedforward TTT3R의 평균 ATE는 72.86m이고 LoGeR*는 18.65m다.","source_anchor":"Table 2, Avg. column","evidence_type":"paper-reported","confidence":"high","notes":"Exact table values."},
+    {"claim_id":"gdm01-c5","final_draft_section":"회사·공동연구 provenance","exact_claim_text":"논문 첫 페이지는 Google DeepMind와 UC Berkeley를 공동 소속으로 명시한다.","source_anchor":"Paper first page affiliation block","evidence_type":"paper-reported","confidence":"high","notes":"Direct organization evidence."}
+  ],
+  "method_map": [
+    {"component":"chunk-wise bidirectional attention","role":"high-fidelity intra-chunk geometry","input":"overlapping video chunk","output":"pointmaps and camera poses","assumption":"short chunks remain near the training distribution","source_anchor":"Section 4.1, Eq. 7"},
+    {"component":"Sliding Window Attention memory","role":"preserve recent uncompressed context","input":"recent chunk features","output":"precise adjacent alignment context","assumption":"recent context contains necessary local detail","source_anchor":"Section 4.1; Figure 1"},
+    {"component":"Test-Time Training memory","role":"compress long-range context and anchor global frame","input":"chunk summaries","output":"parametric fast-weight state","assumption":"global alignment information is compressible","source_anchor":"Section 4.1; Figure 1"}
+  ],
+  "result_table": [
+    {"claim_id":"gdm01-c4","result_claim":"KITTI Table 2에서 feedforward TTT3R의 평균 ATE는 72.86m이고 LoGeR*는 18.65m다.","setup":"KITTI sequences 00-10","exact_value":"ATE 72.86m → 18.65m","comparator":"TTT3R versus LoGeR*","source_anchor":"Table 2, Avg. column","caveat":"Trajectory error does not measure every reconstruction property."},
+    {"claim_id":"gdm01-c3","result_claim":"LoGeR는 128-frame sequence로 학습하고 inference에서는 수천 frame으로 확장한다.","setup":"training curriculum and long-context inference","exact_value":"128 training frames; up to 19k-frame and 11.5km VBR evaluation; base LoGeR 25.44m ATE; LoGeR* reduction above 74%","comparator":"short-window feedforward methods","source_anchor":"Abstract; Section 1; Table 2","caveat":"Longest runs use periodic resets and optional alignment."}
+  ],
+  "critique_log": [
+    {"critique":"ATE is not a complete dense-reconstruction quality metric.","label":"direct inference from setup","action":"accepted","reason":"Prevents metric overgeneralization.","final_prose_location":"한계와 외적 타당성"},
+    {"critique":"The 19k-frame setting uses resets/alignment.","label":"paper-evidenced","action":"accepted","reason":"Required to qualify the long-context claim.","final_prose_location":"한계와 외적 타당성"}
+  ],
+  "apa_references": ["Zhang, J., Herrmann, C., Hur, J., Sun, C., Yang, M.-H., Cole, F., Darrell, T., & Sun, D. (2026). LoGeR: Long-Context Geometric Reconstruction with Hybrid Memory (Version 2). arXiv:2603.03269. https://arxiv.org/abs/2603.03269","LoGeR Project. (2026). LoGeR project page. https://loger-project.github.io/"]
+}

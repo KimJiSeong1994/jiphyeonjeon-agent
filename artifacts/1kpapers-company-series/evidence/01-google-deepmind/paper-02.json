@@ -1,0 +1,26 @@
+{
+  "paper": {"candidate_id":"gdm-2602.17270","title":"Unified Latents (UL): How to train your latents","authors":["Jonathan Heek","Emiel Hoogeboom","Thomas Mensink","Tim Salimans"],"year":2026,"version":"v1","date":"2026-02-19","venue":"arXiv preprint","arxiv_id":"2602.17270","primary_url":"https://arxiv.org/abs/2602.17270","code_url":"unavailable"},
+  "evidence_ledger": [
+    {"claim_id":"gdm02-c1","final_draft_section":"방법","exact_claim_text":"encoder output noise를 prior의 minimum noise level과 연결하면 latent bitrate의 tight upper bound를 얻고, diffusion decoder는 같은 latent로 input을 복원한다.","source_anchor":"Sections 3.2-3.4, Eqs. 2-4","evidence_type":"paper-reported","confidence":"high","notes":"Core objective."},
+    {"claim_id":"gdm02-c2","final_draft_section":"실험 설정과 결과","exact_claim_text":"Table 5의 diffusion prior와 diffusion reconstruction 조합은 latent bpd 0.079, rFID 0.86, gFID 1.4를 기록한다.","source_anchor":"Table 5","evidence_type":"paper-reported","confidence":"high","notes":"Exact ablation row."},
+    {"claim_id":"gdm02-c3","final_draft_section":"실험 설정과 결과","exact_claim_text":"Figure 9에서 medium Unified Latents model은 FVD 1.3을 기록한다.","source_anchor":"Section 5.7; Figure 9","evidence_type":"paper-reported","confidence":"high","notes":"Kinetics-600 headline result."},
+    {"claim_id":"gdm02-c4","final_draft_section":"해석","exact_claim_text":"Table 2는 loss factor가 커질수록 bitrate와 PSNR은 올라가지만 작은 base model의 gFID는 나빠질 수 있음을 보여준다.","source_anchor":"Section 5.4; Table 2","evidence_type":"paper-reported","confidence":"high","notes":"Bitrate trade-off."},
+    {"claim_id":"gdm02-c5","final_draft_section":"회사·공동연구 provenance","exact_claim_text":"논문 첫 페이지는 네 저자의 소속을 Google DeepMind Amsterdam으로 명시한다.","source_anchor":"Paper first page affiliation block","evidence_type":"paper-reported","confidence":"high","notes":"Direct organization evidence."}
+  ],
+  "method_map": [
+    {"component":"noisy encoder","role":"produce bounded-information latents","input":"image or video","output":"noisy latent representation","assumption":"fixed encoder variance stabilizes learning","source_anchor":"Section 3.1; Section 5.8"},
+    {"component":"diffusion prior","role":"regularize and model latent distribution","input":"noisy latents","output":"prior loss and bitrate bound","assumption":"diffusion loss reflects latent coding difficulty","source_anchor":"Sections 3.2-3.3"},
+    {"component":"diffusion decoder","role":"reconstruct observations","input":"latent representation","output":"image/video reconstruction","assumption":"decoder capacity is included in the rate-quality trade-off","source_anchor":"Section 3.4"}
+  ],
+  "result_table": [
+    {"claim_id":"gdm02-c2","result_claim":"Table 5의 diffusion prior와 diffusion reconstruction 조합은 latent bpd 0.079, rFID 0.86, gFID 1.4를 기록한다.","setup":"ImageNet-512, 512×512 image, 16×16 downsample, 32×32 latent ablation","exact_value":"0.079 bpd; 0.86 rFID; 1.4 gFID","comparator":"MSE reconstruction and Normal prior ablations","source_anchor":"Sections 5.3-5.5; Table 5","caveat":"Metric protocol uses the paper's sample/reference convention."},
+    {"claim_id":"gdm02-c3","result_claim":"Figure 9에서 medium Unified Latents model은 FVD 1.3을 기록한다.","setup":"Kinetics-600, 16-frame 128×128 video, 5 conditioning frames and 11 generated frames","exact_value":"FVD 1.3","comparator":"prior video-generation methods","source_anchor":"Section 5.7; Figure 9","caveat":"Specific resolution, frame, and architecture setting."},
+    {"claim_id":"gdm02-c2","result_claim":"ImageNet-512 실험은 512×512 image를 32×32 latent로 downsample하고 FID, reconstruction FID, PSNR, estimated bits를 함께 측정한다.","setup":"ImageNet-512 configuration","exact_value":"512×512 input; 32×32 latent","comparator":"multiple latent settings","source_anchor":"Sections 5.2-5.3","caveat":"Configuration statement."},
+    {"claim_id":"gdm02-c3","result_claim":"Kinetics-600에서는 16-frame 128×128 video를 사용하고 5 frame을 condition으로 주어 11 frame을 생성한다.","setup":"Kinetics-600 configuration","exact_value":"16 frames; 128×128; 5 conditioned; 11 generated","comparator":"video baselines","source_anchor":"Section 5.7","caveat":"Configuration statement."}
+  ],
+  "critique_log": [
+    {"critique":"Low bitrate may move modeling burden into the decoder.","label":"paper-evidenced","action":"accepted","reason":"Section 6.1 states this limitation.","final_prose_location":"한계와 외적 타당성"},
+    {"critique":"Results do not establish a modality-independent scaling law.","label":"paper-evidenced","action":"accepted","reason":"Discussion identifies scaling laws as future work.","final_prose_location":"한계와 외적 타당성"}
+  ],
+  "apa_references": ["Heek, J., Hoogeboom, E., Mensink, T., & Salimans, T. (2026). Unified Latents (UL): How to train your latents (Version 1). arXiv:2602.17270. https://arxiv.org/abs/2602.17270"]
+}

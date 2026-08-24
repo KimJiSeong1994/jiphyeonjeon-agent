@@ -1,0 +1,23 @@
+{
+  "ready": true,
+  "validation_mode": "final",
+  "structural_ready": true,
+  "final_ready": true,
+  "series_id": "1kpapers-company-series-2026-pilot",
+  "counts": {
+    "companies": 3,
+    "drafts": 12,
+    "evidence_bundles": 9
+  },
+  "citability": {
+    "ready": 12,
+    "total": 12,
+    "warning_overrides": 0
+  },
+  "remote_mutations": 0,
+  "publication": {
+    "paperwiki": "blocked_unavailable",
+    "blog": "not_attempted"
+  },
+  "errors": []
+}

@@ -1,0 +1,1121 @@
+{
+  "retrieved_at": "2026-08-23T22:47:24+09:00",
+  "trend_observation": "각 lab catalog에서 후보 포함 여부만 관찰했다. 재현 가능한 rank나 점수는 노출되지 않아 trend 항목은 catalog presence에 대한 편집 점수다.",
+  "selection_weights": {
+    "trend": 25,
+    "recency": 15,
+    "significance": 25,
+    "thematic_coherence": 20,
+    "primary_evidence_availability": 15
+  },
+  "selection_thresholds": {
+    "significance_min": 20,
+    "thematic_coherence_min": 16,
+    "primary_evidence_availability_required": 15,
+    "slots_per_company": 3
+  },
+  "score_formula": {
+    "trend": {
+      "catalog_present": 25
+    },
+    "recency": {
+      "published_2026": 15,
+      "published_2025": 10
+    },
+    "significance": {
+      "series_anchor": 25,
+      "strong_adjacent": 20,
+      "eligible": 15
+    },
+    "thematic_coherence": {
+      "unique_fixed_slot": 20,
+      "adjacent_or_redundant": 15,
+      "outside_sequence": 10
+    },
+    "primary_evidence_availability": {
+      "full_bundle_and_direct_attribution": 15,
+      "stable_primary_identity": 10,
+      "identity_resolution_failed": 5
+    },
+    "total": "sum of the five dimensions"
+  },
+  "selection_rule": "Within each company, rank by recomputed total descending. Select the top three that fill distinct declared editorial_slot values; use stable_id ascending only as a deterministic tie-break within the same slot.",
+  "score_evidence_contract": {
+    "trend": "discovery_sources + retrieved_at + trend_evidence의 catalog presence 관찰",
+    "recency": "stable arXiv ID와 evidence bundle의 published/version date",
+    "significance": "primary paper의 problem scope와 result anchors",
+    "thematic_coherence": "editorial-map의 회사별 세 논문 reading sequence",
+    "primary_evidence_availability": "primary_url + company_attribution_sources + evidence_availability"
+  },
+  "candidate_pool": {
+    "mode": "deterministic_filtered_pool",
+    "observed_fields": [
+      "lab_catalog_url",
+      "catalog_presence",
+      "stable_arxiv_id",
+      "primary_affiliation_evidence"
+    ],
+    "filter": "2025-09 이후 catalog presence가 관찰되고 stable arXiv ID가 있으며, primary paper 또는 official company page로 대상 회사 귀속을 판정할 수 있는 후보",
+    "companies": {
+      "Google DeepMind": [
+        "2603.03269",
+        "2602.17270",
+        "2509.20328",
+        "2605.08083",
+        "2601.23265",
+        "2607.02770",
+        "2605.10899",
+        "2603.26599",
+        "2603.09906",
+        "2602.02660",
+        "2512.20605"
+      ],
+      "Anthropic": [
+        "2601.20245",
+        "2601.04603",
+        "2510.07192",
+        "2602.11729",
+        "2601.19062"
+      ],
+      "OpenAI": [
+        "2603.10521",
+        "2510.04374",
+        "2509.04664",
+        "2607.07184",
+        "2603.05706",
+        "2512.08093",
+        "2511.13653"
+      ]
+    }
+  },
+  "candidates": [
+    {
+      "candidate_id": "gdm-2603.03269",
+      "title": "LoGeR: Long-Context Geometric Reconstruction with Hybrid Memory",
+      "stable_id_type": "arxiv",
+      "stable_id": "2603.03269",
+      "primary_url": "https://arxiv.org/abs/2603.03269",
+      "company": "Google DeepMind",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "publication_affiliation"
+      },
+      "company_attribution_rationale": "논문 첫 페이지와 project page가 Google DeepMind 및 UC Berkeley 공동 연구를 명시한다.",
+      "company_attribution_sources": [
+        "https://arxiv.org/pdf/2603.03269",
+        "https://loger-project.github.io/"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 100,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "Google DeepMind",
+      "cross_company_affiliations": [
+        "UC Berkeley",
+        "BAIR"
+      ],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv v2 PDF and official project page available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2603.03269",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot long-context-geometry.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "long-context-geometry"
+    },
+    {
+      "candidate_id": "gdm-2602.17270",
+      "title": "Unified Latents (UL): How to train your latents",
+      "stable_id_type": "arxiv",
+      "stable_id": "2602.17270",
+      "primary_url": "https://arxiv.org/abs/2602.17270",
+      "company": "Google DeepMind",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "publication_affiliation"
+      },
+      "company_attribution_rationale": "논문 첫 페이지가 모든 저자의 소속을 Google DeepMind Amsterdam으로 명시한다.",
+      "company_attribution_sources": [
+        "https://arxiv.org/pdf/2602.17270"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 100,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "Google DeepMind",
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv v1 PDF with direct affiliation available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2602.17270",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot latent-representation.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "latent-representation"
+    },
+    {
+      "candidate_id": "gdm-2509.20328",
+      "title": "Video models are zero-shot learners and reasoners",
+      "stable_id_type": "arxiv",
+      "stable_id": "2509.20328",
+      "primary_url": "https://arxiv.org/abs/2509.20328",
+      "company": "Google DeepMind",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "official_publication_page"
+      },
+      "company_attribution_rationale": "Google DeepMind 공식 publications 페이지가 논문·저자·날짜를 게시한다.",
+      "company_attribution_sources": [
+        "https://deepmind.google/research/publications/203190/"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 95,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "Google DeepMind",
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv and Google DeepMind publication page available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2509.20328",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot video-capability.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "video-capability"
+    },
+    {
+      "candidate_id": "anthropic-2601.20245",
+      "title": "How AI Impacts Skill Formation",
+      "stable_id_type": "arxiv",
+      "stable_id": "2601.20245",
+      "primary_url": "https://arxiv.org/abs/2601.20245",
+      "company": "Anthropic",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "Anthropic",
+        "organization_type": "company",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "Anthropic 공식 연구 페이지가 연구 설계와 논문 링크를 게시한다.",
+      "company_attribution_sources": [
+        "https://www.anthropic.com/research/AI-assistance-coding-skills"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/anthropic"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 100,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "Anthropic",
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv and Anthropic research article available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2601.20245",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot human-skill.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "human-skill"
+    },
+    {
+      "candidate_id": "anthropic-2601.04603",
+      "title": "Constitutional Classifiers++: Efficient Production-Grade Defenses against Universal Jailbreaks",
+      "stable_id_type": "arxiv",
+      "stable_id": "2601.04603",
+      "primary_url": "https://arxiv.org/abs/2601.04603",
+      "company": "Anthropic",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "Anthropic",
+        "organization_type": "company",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "Anthropic 공식 연구 페이지가 차세대 Constitutional Classifiers를 소개하고 논문에 연결한다.",
+      "company_attribution_sources": [
+        "https://www.anthropic.com/research/next-generation-constitutional-classifiers"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/anthropic"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 100,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "Anthropic",
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv and Anthropic research article available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2601.04603",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot operational-defense.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "operational-defense"
+    },
+    {
+      "candidate_id": "anthropic-2510.07192",
+      "title": "Poisoning Attacks on LLMs Require a Near-constant Number of Poison Samples",
+      "stable_id_type": "arxiv",
+      "stable_id": "2510.07192",
+      "primary_url": "https://arxiv.org/abs/2510.07192",
+      "company": "Anthropic",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "Anthropic",
+        "organization_type": "company",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "Anthropic 공식 연구 페이지가 공동 연구의 저자 소속과 실험 범위를 명시한다.",
+      "company_attribution_sources": [
+        "https://www.anthropic.com/research/small-samples-poison"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/anthropic"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 95,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "Anthropic",
+      "cross_company_affiliations": [
+        "UK AI Security Institute",
+        "The Alan Turing Institute",
+        "University of Oxford",
+        "ETH Zurich"
+      ],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv and Anthropic research article available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2510.07192",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot data-poisoning.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "data-poisoning"
+    },
+    {
+      "candidate_id": "openai-2603.10521",
+      "title": "IH-Challenge: A Training Dataset to Improve Instruction Hierarchy on Frontier LLMs",
+      "stable_id_type": "arxiv",
+      "stable_id": "2603.10521",
+      "primary_url": "https://arxiv.org/abs/2603.10521",
+      "company": "OpenAI",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "OpenAI 공식 연구 페이지와 호스팅 PDF가 논문과 저자 소속을 명시한다.",
+      "company_attribution_sources": [
+        "https://openai.com/index/instruction-hierarchy-challenge/"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 100,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "OpenAI",
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv, OpenAI article, and official PDF available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2603.10521",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot instruction-hierarchy.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "instruction-hierarchy"
+    },
+    {
+      "candidate_id": "openai-2510.04374",
+      "title": "GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks",
+      "stable_id_type": "arxiv",
+      "stable_id": "2510.04374",
+      "primary_url": "https://arxiv.org/abs/2510.04374",
+      "company": "OpenAI",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "OpenAI 공식 평가 포털과 연구 글이 GDPval을 게시한다.",
+      "company_attribution_sources": [
+        "https://evals.openai.com/",
+        "https://openai.com/index/gdpval/"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 95,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "OpenAI",
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv, OpenAI article, official PDF, and evaluation portal available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2510.04374",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot economic-evaluation.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "economic-evaluation"
+    },
+    {
+      "candidate_id": "openai-2509.04664",
+      "title": "Why Language Models Hallucinate",
+      "stable_id_type": "arxiv",
+      "stable_id": "2509.04664",
+      "primary_url": "https://arxiv.org/abs/2509.04664",
+      "company": "OpenAI",
+      "company_attribution_status": "verified",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "OpenAI 공식 연구 글과 호스팅 PDF가 논문을 게시한다.",
+      "company_attribution_sources": [
+        "https://openai.com/index/why-language-models-hallucinate/"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog discovery",
+      "selection_score": 95,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 25,
+        "thematic_coherence": 20,
+        "primary_evidence_availability": 15
+      },
+      "selected": true,
+      "canonical_company": "OpenAI",
+      "cross_company_affiliations": [
+        "Georgia Institute of Technology"
+      ],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv, OpenAI article, and official PDF available",
+      "exclusion_reason": null,
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2509.04664",
+        "significance": "significance=25: series-anchor paper with a complete review bundle.",
+        "thematic_coherence": "thematic_coherence=20: fills declared unique slot hallucination-mechanism.",
+        "primary_evidence_availability": "primary_evidence_availability=15: complete bundle and direct attribution available."
+      },
+      "editorial_slot": "hallucination-mechanism"
+    },
+    {
+      "candidate_id": "excluded-2605.08083",
+      "title": "LLMs Improving LLMs: Agentic Discovery for Test-Time Scaling",
+      "stable_id_type": "arxiv",
+      "stable_id": "2605.08083",
+      "primary_url": "https://arxiv.org/abs/2605.08083",
+      "company": "Google DeepMind",
+      "company_attribution_status": "rejected",
+      "company_attribution": {
+        "organization": "Google",
+        "organization_type": "company",
+        "evidence_kind": "publication_affiliation"
+      },
+      "company_attribution_rationale": "논문은 Google 공동 저자를 명시하지만 Google DeepMind 직접 소속은 명시하지 않는다.",
+      "company_attribution_sources": [
+        "https://arxiv.org/pdf/2605.08083"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [
+        "Google"
+      ],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv v2 PDF available",
+      "exclusion_reason": "No direct Google DeepMind publication affiliation; replaced after architecture review.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2605.08083",
+        "significance": "significance=15: No direct Google DeepMind publication affiliation; replaced after architecture review.",
+        "thematic_coherence": "thematic_coherence=10: No direct Google DeepMind publication affiliation; replaced after architecture review.",
+        "primary_evidence_availability": "primary_evidence_availability=10: arXiv v2 PDF available"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "excluded-2601.23265",
+      "title": "PaperBanana: Automating Academic Illustration for AI Scientists",
+      "stable_id_type": "arxiv",
+      "stable_id": "2601.23265",
+      "primary_url": "https://arxiv.org/abs/2601.23265",
+      "company": "Google DeepMind",
+      "company_attribution_status": "rejected",
+      "company_attribution": {
+        "organization": "Google Research",
+        "organization_type": "research_organization",
+        "evidence_kind": "official_research_page"
+      },
+      "company_attribution_rationale": "Google Research 공식 글은 확인되지만 Google DeepMind 직접 귀속은 확인되지 않는다.",
+      "company_attribution_sources": [
+        "https://www.research.google/blog/improving-the-academic-workflow-introducing-two-ai-agents-for-better-figures-and-peer-review/"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "1K Papers lab catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [
+        "Google Research"
+      ],
+      "duplicate_of": null,
+      "evidence_availability": "arXiv and Google Research article available",
+      "exclusion_reason": "Direct Google DeepMind attribution unavailable; replaced after architecture review.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2601.23265",
+        "significance": "significance=15: Direct Google DeepMind attribution unavailable; replaced after architecture review.",
+        "thematic_coherence": "thematic_coherence=10: Direct Google DeepMind attribution unavailable; replaced after architecture review.",
+        "primary_evidence_availability": "primary_evidence_availability=10: arXiv and Google Research article available"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "gdm-pool-2607.02770",
+      "title": "Gemma 4 Technical Report",
+      "stable_id_type": "arxiv",
+      "stable_id": "2607.02770",
+      "primary_url": "https://arxiv.org/abs/2607.02770",
+      "company": "Google DeepMind",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2607.02770"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Broad technical report is outside the fixed geometry/latent/video-capability slots.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2607.02770",
+        "significance": "significance=15: Broad technical report is outside the fixed geometry/latent/video-capability slots.",
+        "thematic_coherence": "thematic_coherence=10: Broad technical report is outside the fixed geometry/latent/video-capability slots.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "gdm-pool-2605.10899",
+      "title": "RubricEM: Meta-RL with Rubric-guided Policy Decomposition beyond Verifiable Rewards",
+      "stable_id_type": "arxiv",
+      "stable_id": "2605.10899",
+      "primary_url": "https://arxiv.org/abs/2605.10899",
+      "company": "Google DeepMind",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2605.10899"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Reward-learning topic is outside the fixed visual-world sequence.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2605.10899",
+        "significance": "significance=15: Reward-learning topic is outside the fixed visual-world sequence.",
+        "thematic_coherence": "thematic_coherence=10: Reward-learning topic is outside the fixed visual-world sequence.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "gdm-pool-2603.26599",
+      "title": "VGGRPO: Towards World-Consistent Video Generation with 4D Latent Reward",
+      "stable_id_type": "arxiv",
+      "stable_id": "2603.26599",
+      "primary_url": "https://arxiv.org/abs/2603.26599",
+      "company": "Google DeepMind",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2603.26599"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 85,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 20,
+        "thematic_coherence": 15,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Overlaps the selected video-model slot occupied by the broader capability study.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2603.26599",
+        "significance": "significance=20: Overlaps the selected video-model slot occupied by the broader capability study.",
+        "thematic_coherence": "thematic_coherence=15: Overlaps the selected video-model slot occupied by the broader capability study.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "gdm-pool-2603.09906",
+      "title": "Thinking to Recall: How Reasoning Unlocks Parametric Knowledge in LLMs",
+      "stable_id_type": "arxiv",
+      "stable_id": "2603.09906",
+      "primary_url": "https://arxiv.org/abs/2603.09906",
+      "company": "Google DeepMind",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2603.09906"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "LLM recall is outside the fixed GDM visual-world sequence.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2603.09906",
+        "significance": "significance=15: LLM recall is outside the fixed GDM visual-world sequence.",
+        "thematic_coherence": "thematic_coherence=10: LLM recall is outside the fixed GDM visual-world sequence.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "gdm-pool-2602.02660",
+      "title": "MARS: Modular Agent with Reflective Search for Automated AI Research",
+      "stable_id_type": "arxiv",
+      "stable_id": "2602.02660",
+      "primary_url": "https://arxiv.org/abs/2602.02660",
+      "company": "Google DeepMind",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2602.02660"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Automated-research agents are outside the fixed visual-world sequence.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2602.02660",
+        "significance": "significance=15: Automated-research agents are outside the fixed visual-world sequence.",
+        "thematic_coherence": "thematic_coherence=10: Automated-research agents are outside the fixed visual-world sequence.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "gdm-pool-2512.20605",
+      "title": "Emergent temporal abstractions in autoregressive models enable hierarchical reinforcement learning",
+      "stable_id_type": "arxiv",
+      "stable_id": "2512.20605",
+      "primary_url": "https://arxiv.org/abs/2512.20605",
+      "company": "Google DeepMind",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Google DeepMind",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2512.20605"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/google-deepmind"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 70,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Hierarchical RL is not one of the fixed three editorial slots.",
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2512.20605",
+        "significance": "significance=15: Hierarchical RL is not one of the fixed three editorial slots.",
+        "thematic_coherence": "thematic_coherence=10: Hierarchical RL is not one of the fixed three editorial slots.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "anthropic-pool-2602.11729",
+      "title": "Cross-Architecture Model Diffing with Crosscoders: Unsupervised Discovery of Differences Between LLMs",
+      "stable_id_type": "arxiv",
+      "stable_id": "2602.11729",
+      "primary_url": "https://arxiv.org/abs/2602.11729",
+      "company": "Anthropic",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Anthropic",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2602.11729"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/anthropic"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Interpretability diffing is outside the selected human/defense/poisoning safety layers.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2602.11729",
+        "significance": "significance=15: Interpretability diffing is outside the selected human/defense/poisoning safety layers.",
+        "thematic_coherence": "thematic_coherence=10: Interpretability diffing is outside the selected human/defense/poisoning safety layers.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "anthropic-pool-2601.19062",
+      "title": "Who’s in Charge? Disempowerment Patterns in Real-World LLM Usage",
+      "stable_id_type": "arxiv",
+      "stable_id": "2601.19062",
+      "primary_url": "https://arxiv.org/abs/2601.19062",
+      "company": "Anthropic",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "Anthropic",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2601.19062"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/anthropic"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 85,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 20,
+        "thematic_coherence": 15,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Overlaps the human-impact slot occupied by the randomized skill study.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2601.19062",
+        "significance": "significance=20: Overlaps the human-impact slot occupied by the randomized skill study.",
+        "thematic_coherence": "thematic_coherence=15: Overlaps the human-impact slot occupied by the randomized skill study.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "openai-pool-2607.07184",
+      "title": "Predicting LLM Safety Before Release by Simulating Deployment",
+      "stable_id_type": "arxiv",
+      "stable_id": "2607.07184",
+      "primary_url": "https://arxiv.org/abs/2607.07184",
+      "company": "OpenAI",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2607.07184"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Release simulation is outside the fixed instruction/economic-eval/hallucination slots.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2607.07184",
+        "significance": "significance=15: Release simulation is outside the fixed instruction/economic-eval/hallucination slots.",
+        "thematic_coherence": "thematic_coherence=10: Release simulation is outside the fixed instruction/economic-eval/hallucination slots.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "openai-pool-2603.05706",
+      "title": "Reasoning Models Struggle to Control their Chains of Thought",
+      "stable_id_type": "arxiv",
+      "stable_id": "2603.05706",
+      "primary_url": "https://arxiv.org/abs/2603.05706",
+      "company": "OpenAI",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2603.05706"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 75,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 15,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Chain-of-thought control is not a fixed editorial slot.",
+      "score_rationale": {
+        "recency": "recency=15: arXiv year band derived from stable ID 2603.05706",
+        "significance": "significance=15: Chain-of-thought control is not a fixed editorial slot.",
+        "thematic_coherence": "thematic_coherence=10: Chain-of-thought control is not a fixed editorial slot.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "openai-pool-2512.08093",
+      "title": "Training LLMs for Honesty via Confessions",
+      "stable_id_type": "arxiv",
+      "stable_id": "2512.08093",
+      "primary_url": "https://arxiv.org/abs/2512.08093",
+      "company": "OpenAI",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2512.08093"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 80,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 20,
+        "thematic_coherence": 15,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Honesty training overlaps the hallucination slot occupied by the mechanism paper.",
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2512.08093",
+        "significance": "significance=20: Honesty training overlaps the hallucination slot occupied by the mechanism paper.",
+        "thematic_coherence": "thematic_coherence=15: Honesty training overlaps the hallucination slot occupied by the mechanism paper.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    },
+    {
+      "candidate_id": "openai-pool-2511.13653",
+      "title": "Weight-sparse transformers have interpretable circuits",
+      "stable_id_type": "arxiv",
+      "stable_id": "2511.13653",
+      "primary_url": "https://arxiv.org/abs/2511.13653",
+      "company": "OpenAI",
+      "company_attribution_status": "catalog_only",
+      "company_attribution": {
+        "organization": "OpenAI",
+        "organization_type": "company",
+        "evidence_kind": "1kpapers_catalog_classification"
+      },
+      "company_attribution_rationale": "1K Papers catalog presence observed; direct publication affiliation was not re-audited for this unselected item.",
+      "company_attribution_sources": [
+        "https://arxiv.org/abs/2511.13653"
+      ],
+      "discovery_sources": [
+        "https://www.1kpapers.com/labs/openai"
+      ],
+      "retrieved_at": "2026-08-23T22:47:24+09:00",
+      "trend_evidence": "catalog presence observed",
+      "selection_score": 70,
+      "score_breakdown": {
+        "trend": 25,
+        "recency": 10,
+        "significance": 15,
+        "thematic_coherence": 10,
+        "primary_evidence_availability": 10
+      },
+      "selected": false,
+      "canonical_company": null,
+      "cross_company_affiliations": [],
+      "duplicate_of": null,
+      "evidence_availability": "stable arXiv identity resolved",
+      "exclusion_reason": "Interpretability circuits are outside the fixed three-slot trust sequence.",
+      "score_rationale": {
+        "recency": "recency=10: arXiv year band derived from stable ID 2511.13653",
+        "significance": "significance=15: Interpretability circuits are outside the fixed three-slot trust sequence.",
+        "thematic_coherence": "thematic_coherence=10: Interpretability circuits are outside the fixed three-slot trust sequence.",
+        "primary_evidence_availability": "primary_evidence_availability=10: stable arXiv identity resolved"
+      },
+      "editorial_slot": null
+    }
+  ]
+}
