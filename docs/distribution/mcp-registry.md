@@ -34,8 +34,8 @@ npx @anthropic-ai/mcpb init      # manifest.json 생성/편집
 npx @anthropic-ai/mcpb pack      # -> jiphyeonjeon-agent.mcpb
 
 # 2) GitHub 릴리스에 첨부
-gh release create v0.1.5 --generate-notes
-gh release upload v0.1.5 jiphyeonjeon-agent.mcpb
+gh release create v0.1.6 --generate-notes
+gh release upload v0.1.6 jiphyeonjeon-agent.mcpb
 
 # 3) sha256 계산 → server.json(mcpb 변형)의 fileSha256 에 기입
 openssl dgst -sha256 jiphyeonjeon-agent.mcpb
@@ -52,7 +52,7 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=jiphyeonjeon"
 ```json
 {
   "registryType": "mcpb",
-  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.5/jiphyeonjeon-agent.mcpb",
+  "identifier": "https://github.com/KimJiSeong1994/jiphyeonjeon-agent/releases/download/v0.1.6/jiphyeonjeon-agent.mcpb",
   "fileSha256": "<openssl 결과>",
   "transport": { "type": "stdio" }
 }
