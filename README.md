@@ -143,6 +143,7 @@ make install-skills   # ~/.claude/skills/ 로 복사
 - **Strict Tool Inputs** — 모든 도구가 선언하지 않은 인자를 거부하고 JSON Schema에 `additionalProperties: false`를 노출.
 - **Contract Drift Gate** — 사용 중인 REST 경로·메서드·필드를 OpenAPI fixture와 PR CI에서 검증하고, 설정 시 nightly에서 live 문서도 검증.
 - **Connection Reuse** — stdio 서버 수명 동안 인증된 HTTP 연결 풀 하나를 재사용하고 종료 시 명시적으로 닫음.
+- **Privacy-bounded Usage Measurement** — 도구 이름·상태·소요 시간만 크기 제한 큐로 전송. 인자·결과·토큰은 수집하지 않으며 `JIPHYEONJEON_USAGE_TELEMETRY=0`으로 끌 수 있음.
 - **Stdio JSON-RPC** — 모든 로그는 stderr로, stdout은 JSON-RPC만 → Claude Code 통신 간섭 없음.
 
 ---
@@ -195,6 +196,7 @@ Claude Code (stdio)
 | `JIPHYEONJEON_TIMEOUT` | No | 요청 타임아웃 초 (기본: `30.0`, 검색은 90 권장) |
 | `JIPHYEONJEON_VERIFY_SSL` | No | TLS 인증서 검증 (기본: `true`, 로컬 자체 서명만 false) |
 | `JIPHYEONJEON_AUTO_UPDATE_CHECK` | No | 시작 시 GitHub Releases 에서 새 버전 확인 (기본: `true`, `0` 으로 비활성화). 알림만 — 자동 업데이트 아님 |
+| `JIPHYEONJEON_USAGE_TELEMETRY` | No | 도구 이름·결과 상태·소요 시간과 요청 연결용 invocation 메타데이터 전송 (기본: `true`, `0` 으로 비활성화). 인자·결과·토큰·사용자 ID는 전송하지 않음 |
 | `JIPHYEONJEON_SCOPE` | No | Claude Code MCP 등록 스코프 (기본: `user`) |
 
 ---
@@ -369,13 +371,14 @@ JIPHYEONJEON_TOKEN=<dedicated-test-jwt> uv run python scripts/e2e_live.py
 
 ## Roadmap
 
-### v0.1.5 (현재)
+### v0.1.6 (현재)
 - 14 tools + 7 skills
 - JWT 패스스루 인증
 - stdio transport
 - fail-closed capability negotiation + 보수적 fallback
 - OpenAPI 계약 drift CI + nightly live E2E
 - strict tool arguments + 공유 HTTP connection pool
+- 인자·결과를 수집하지 않는 fail-open MCP 사용 측정 + 명시적 opt-out
 
 ### v0.2.0 (예정)
 - PAT (Personal Access Token) 지원 — 장기 만료 토큰 옵션

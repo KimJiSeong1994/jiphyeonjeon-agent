@@ -150,7 +150,12 @@ class JiphyeonjeonClient:
     ) -> httpx.Response:
         if self._client is None:
             raise RuntimeError("JiphyeonjeonClient used outside async context manager")
+        from jiphyeonjeon_mcp.telemetry import invocation_headers
+
         kwargs: dict[str, Any] = {"params": params, "json": json}
+        headers = invocation_headers()
+        if headers:
+            kwargs["headers"] = headers
         effective_timeout = timeout if timeout is not None else self._settings.timeout
         if timeout is not None:
             kwargs["timeout"] = timeout

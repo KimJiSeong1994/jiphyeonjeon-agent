@@ -31,6 +31,7 @@ from jiphyeonjeon_mcp.capability import (
 )
 from jiphyeonjeon_mcp.client import JiphyeonjeonClient
 from jiphyeonjeon_mcp.config import Settings, load_settings
+from jiphyeonjeon_mcp.telemetry import MeasuredFastMCP, UsageTelemetry
 from jiphyeonjeon_mcp.tools import register_all
 from jiphyeonjeon_mcp.updater import UpdateCheckResult, check_for_updates
 
@@ -120,10 +121,12 @@ def _build_server(
     capabilities: ServerCapabilities,
 ) -> tuple[FastMCP[Any], list[str]]:
     pool = _SharedClientPool(settings)
+    telemetry = UsageTelemetry(settings)
 
     @asynccontextmanager
     async def lifespan(_server: FastMCP[Any]) -> AsyncIterator[None]:
         async with pool:
+            await telemetry.start()
             update_task = asyncio.create_task(_check_for_updates_in_background(settings))
             try:
                 yield None
@@ -132,8 +135,10 @@ def _build_server(
                     update_task.cancel()
                 with suppress(asyncio.CancelledError):
                     await update_task
+                await telemetry.close()
 
-    mcp = FastMCP(
+    mcp = MeasuredFastMCP(
+        telemetry=telemetry,
         name="jiphyeonjeon",
         instructions=(
             f"집현전 (PaperReviewAgent) MCP server v{__version__}. Exposes paper search, "

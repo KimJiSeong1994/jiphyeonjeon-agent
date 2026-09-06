@@ -56,6 +56,14 @@ class Settings(BaseSettings):
             "is advisory only — it logs to stderr and never blocks startup."
         ),
     )
+    usage_telemetry: bool = Field(
+        default=True,
+        description=(
+            "Send bounded tool name/outcome/duration metadata to the configured backend. "
+            "Never includes arguments or results. Set JIPHYEONJEON_USAGE_TELEMETRY=0 "
+            "to disable tool telemetry and invocation headers."
+        ),
+    )
 
     @property
     def normalized_base_url(self) -> str:

@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.1.6 — 2026-09-06
+
+Privacy-bounded MCP usage measurement.
+
+- Added best-effort tool lifecycle telemetry with per-invocation identifiers, terminal outcomes,
+  and durations. Telemetry never contains tool arguments, results, bearer tokens, or user IDs.
+- Propagated invocation, tool, and client claim headers to related backend requests without
+  sharing context between concurrent calls.
+- Covered local tools and pre-handler schema failures at the FastMCP call boundary, including
+  cancellation outcomes.
+- Kept measurement fail-open through a bounded queue, short delivery timeout, no retries, and
+  automatic fallback for backends that do not expose the telemetry endpoint.
+- Added `JIPHYEONJEON_USAGE_TELEMETRY=0` as an explicit opt-out. Existing adapters remain
+  compatible and continue without tool-level measurement.
+- Distribution remains GitHub Release/source-install only; this release does not publish to PyPI.
+
 ## v0.1.5 — 2026-08-10
 
 Runtime and upstream-contract stabilization.
